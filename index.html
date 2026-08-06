@@ -17,8 +17,18 @@
         }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen p-4 md:p-8 font-sans">
-    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+<body class="bg-slate-100 min-h-screen p-4 md:p-8 font-sans relative">
+    
+    <!-- ПЛАШКА КОПИРОВАНИЯ ССЫЛКИ -->
+    <div class="max-w-3xl mx-auto flex justify-end mb-4">
+        <button id="copyLinkBtn" onclick="copyCalculatorLink()" class="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+            <span id="copyLinkText">Скопировать ссылку</span>
+        </button>
+    </div>
+
+    <!-- ОСНОВНОЙ КАЛЬКУЛЯТОР -->
+    <div id="main-app" class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
         <!-- Шапка -->
         <div class="bg-slate-800 text-white p-6 md:p-8 relative">
             <h1 class="text-2xl md:text-3xl font-bold flex items-center gap-3">
@@ -26,11 +36,6 @@
                 Расчет инвестиционной доходности
             </h1>
             <p class="text-slate-300 mt-2 text-sm md:text-base pr-20">Оцените рентабельность проекта или рассчитайте нужную цену продажи под целевую доходность.</p>
-            
-            <button onclick="copyAppUrl()" id="copyBtn" class="mt-5 flex items-center gap-2 text-sm bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-lg transition-colors shadow-sm w-fit">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                <span id="copyBtnText">Скопировать ссылку</span>
-            </button>
         </div>
 
         <!-- Вкладки -->
@@ -44,7 +49,6 @@
         </div>
 
         <div class="p-6 md:p-8">
-            <!-- Блок ошибки -->
             <div id="errorMessage" class="hidden mb-6 p-4 bg-red-50 text-red-600 rounded-lg flex items-center gap-2 text-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 <span id="errorText">Заполните все обязательные поля.</span>
@@ -56,20 +60,35 @@
                     <h3 class="text-lg font-semibold text-slate-800 border-b pb-2">Параметры объекта</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label id="dynamicLabel" class="block text-sm font-medium text-slate-700 mb-1">Цена продажи объекта (₽)</label>
-                            <input type="number" id="dynamicInput" placeholder="Например 15000000" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                            <label id="dynamicLabel" class="block text-sm font-medium text-slate-700 mb-1">Цена продажи объекта</label>
+                            <input type="number" id="dynamicInput" placeholder="Например 15000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Цена покупки объекта (₽)</label>
-                            <input type="number" id="buyPrice" placeholder="Например 10000000" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Цена покупки объекта</label>
+                            <input type="number" id="buyPrice" placeholder="Например 10000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Затраты на ремонт (₽)</label>
-                            <input type="number" id="renovation" placeholder="Например 2000000" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Фактические расходы на проект</label>
+                            <input type="number" id="renovation" placeholder="Например 2000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Срок сделки (в днях)</label>
-                            <input type="number" id="dealDays" placeholder="Например 90" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-sm font-medium text-slate-700">Срок сделки (в днях)</label>
+                                <button type="button" onclick="toggleDateInputs()" class="text-xs text-indigo-600 hover:text-indigo-800 border-b border-dashed border-indigo-400 transition-colors">Рассчитать по датам</button>
+                            </div>
+                            <input type="number" id="dealDays" placeholder="Например 90" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                            
+                            <!-- Скрытый блок для дат -->
+                            <div id="dateCalcBlock" class="hidden mt-3 grid grid-cols-2 gap-3 p-3 bg-indigo-50/50 border border-indigo-100 rounded-lg">
+                                <div>
+                                    <label class="block text-xs text-slate-600 mb-1">Дата покупки</label>
+                                    <input type="date" id="buyDate" onchange="calcDays()" class="w-full p-2 text-sm border border-slate-300 rounded-md outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-600 mb-1">Дата продажи</label>
+                                    <input type="date" id="sellDate" onchange="calcDays()" class="w-full p-2 text-sm border border-slate-300 rounded-md outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -77,23 +96,33 @@
                 <!-- Налогообложение -->
                 <div class="space-y-4 md:col-span-2 mt-2">
                     <h3 class="text-lg font-semibold text-slate-800 border-b pb-2">Налогообложение (15%)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                        <div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div class="md:col-span-3">
                             <label class="block text-sm font-medium text-slate-700 mb-2">Тип собственника</label>
                             <div class="flex gap-4">
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="ownerType" value="ip" checked class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
-                                    <span class="text-sm text-slate-700">ИП (с вычетом ремонта)</span>
+                                    <input type="radio" name="ownerType" value="ip" checked onchange="autoRecalculate()" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                    <span class="text-sm text-slate-700">ИП</span>
                                 </label>
                                 <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="ownerType" value="fiz" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                    <input type="radio" name="ownerType" value="fiz" onchange="autoRecalculate()" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
                                     <span class="text-sm text-slate-700">Физ. лицо</span>
                                 </label>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Цена в ДКП (₽) *опционально</label>
-                            <input type="number" id="dkpPrice" placeholder="По умолч. равна цене продажи" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Цена в ДКП</label>
+                            <input type="number" id="dkpPrice" placeholder="По умолч. цена продажи" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                        </div>
+                        <div class="bg-blue-50 p-3 rounded-lg -m-2 border border-blue-200">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label class="block text-sm font-bold text-blue-900">Подтвержд. расходы</label>
+                                <select id="deductibleType" onchange="handleDeductibleTypeChange(); autoRecalculate()" class="text-xs bg-white border border-blue-200 rounded px-1 py-0.5 text-blue-800 font-bold outline-none cursor-pointer">
+                                    <option value="percent">% от расходов</option>
+                                    <option value="sum">Сумма</option>
+                                </select>
+                            </div>
+                            <input type="number" id="taxDeductibleValue" value="80" oninput="autoRecalculate()" placeholder="Например 80" class="w-full p-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all font-semibold text-blue-900">
                         </div>
                     </div>
                 </div>
@@ -103,23 +132,31 @@
                     <h3 class="text-lg font-semibold text-slate-800 border-b pb-2">Параметры инвестора</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Сумма вложений (₽)</label>
-                            <input type="number" id="investorAmount" placeholder="Например 12000000" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                            <label class="block text-sm font-medium text-slate-700 mb-1">Сумма займа (инвестиций)</label>
+                            <input type="number" id="investorAmount" placeholder="Например 12000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">Доля прибыли инвестора (%)</label>
-                            <input type="number" id="investorsShare" placeholder="Например 50" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-sm font-medium text-slate-700">Доля прибыли инвестора (%)</label>
+                                <select id="profitMultiplier" onchange="autoRecalculate()" class="text-xs bg-indigo-50 border border-indigo-200 rounded px-1.5 py-0.5 text-indigo-800 font-bold outline-none cursor-pointer">
+                                    <option value="50">Условия: 50%</option>
+                                    <option value="60" selected>Условия: 60%</option>
+                                    <option value="70">Условия: 70%</option>
+                                </select>
+                            </div>
+                            <input type="text" id="investorsShare" readonly placeholder="Считается автоматически" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all font-semibold text-slate-600 cursor-not-allowed">
+                            <p class="text-[11px] text-slate-500 mt-1 leading-tight">Расчет: (Займ / Бюджет) × <span id="multDisplay" class="font-bold">60</span>%</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <button onclick="calculateROI()" class="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2">
+            <button onclick="calculateROI(true)" class="w-full mt-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                 Рассчитать
             </button>
 
-            <!-- Результаты -->
+            <!-- БЛОК РЕЗУЛЬТАТОВ -->
             <div id="results" class="hidden mt-8 space-y-6 animate-fade-in">
                 
                 <div id="resRequiredSalePriceBlock" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
@@ -127,14 +164,18 @@
                     <p id="resRequiredSalePrice" class="text-3xl md:text-4xl font-bold text-blue-700"></p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
-                        <p class="text-slate-500 text-sm mb-1">Чистая прибыль (Тотал)</p>
+                        <p class="text-slate-500 text-sm mb-1">Прибыль проекта (Тотал)</p>
                         <p id="resTotalProfit" class="text-xl font-bold text-slate-800"></p>
                     </div>
-                    <div id="projectYieldBlock" class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
                         <p class="text-slate-500 text-sm mb-1">Доходность проекта</p>
                         <p id="resProjectYield" class="text-xl font-bold text-slate-800"></p>
+                    </div>
+                    <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-200">
+                        <p class="text-indigo-600 text-sm mb-1 font-medium">Прибыль инвестора</p>
+                        <p id="resInvestorProfit" class="text-xl font-bold text-indigo-700"></p>
                     </div>
                     <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-200">
                         <p class="text-indigo-600 text-sm mb-1 font-medium">Доходность инвестора</p>
@@ -142,227 +183,226 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center">
-                        <span class="text-slate-500 text-sm">Прибыль инвестора</span>
-                        <span id="resInvestorProfit" class="font-bold text-slate-800"></span>
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center">
-                        <span class="text-slate-500 text-sm">Сумма налога (15%)</span>
-                        <span id="resTax" class="font-bold text-slate-800"></span>
-                    </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center">
+                    <span class="text-slate-500 text-sm">Налог (15%)</span>
+                    <span id="resTax" class="font-bold text-slate-800"></span>
                 </div>
 
                 <!-- Умное резюме -->
-                <div id="smartSummary" class="mt-6 p-5 rounded-xl text-sm leading-relaxed border"></div>
+                <div id="smartSummary" class="mt-4"></div>
+                <!-- КНОПКА ОТЧЕТА УДАЛЕНА ОТСЮДА -->
             </div>
-            
-            <footer class="mt-8 text-center text-slate-400 text-xs">
-                © 2026 Продажа элитной недвижимости в Москве
-            </footer>
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО И ПЕЧАТНАЯ ФОРМА УДАЛЕНЫ ПОЛНОСТЬЮ -->
+
     <script>
         let currentMode = 1;
+        let isCalculated = false;
 
-        const dynamicLabel = document.getElementById('dynamicLabel');
-        const dynamicInput = document.getElementById('dynamicInput');
-        const tabMode1 = document.getElementById('tabMode1');
-        const tabMode2 = document.getElementById('tabMode2');
+        function copyCalculatorLink() {
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            
+            const btn = document.getElementById('copyLinkBtn');
+            const btnText = document.getElementById('copyLinkText');
+            
+            btnText.textContent = 'Ссылка скопирована!';
+            btn.classList.add('text-green-600', 'border-green-300', 'bg-green-50');
+            btn.classList.remove('text-slate-600');
+            
+            setTimeout(() => {
+                btnText.textContent = 'Скопировать ссылку';
+                btn.classList.remove('text-green-600', 'border-green-300', 'bg-green-50');
+                btn.classList.add('text-slate-600');
+            }, 2000);
+        }
+
+        function toggleDateInputs() {
+            const block = document.getElementById('dateCalcBlock');
+            block.classList.toggle('hidden');
+        }
+
+        function calcDays() {
+            const bDate = document.getElementById('buyDate').value;
+            const sDate = document.getElementById('sellDate').value;
+            if (bDate && sDate) {
+                const start = new Date(bDate);
+                const end = new Date(sDate);
+                const diffTime = end - start;
+                
+                if (diffTime >= 0) {
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    document.getElementById('dealDays').value = diffDays;
+                    autoRecalculate();
+                }
+            }
+        }
 
         function switchMode(mode) {
             currentMode = mode;
             document.getElementById('results').classList.add('hidden');
-            document.getElementById('errorMessage').classList.add('hidden');
+            document.getElementById('tabMode1').classList.toggle('border-indigo-600', mode === 1);
+            document.getElementById('tabMode1').classList.toggle('text-indigo-600', mode === 1);
+            document.getElementById('tabMode1').classList.toggle('border-transparent', mode !== 1);
+            document.getElementById('tabMode1').classList.toggle('text-slate-500', mode !== 1);
             
+            document.getElementById('tabMode2').classList.toggle('border-indigo-600', mode === 2);
+            document.getElementById('tabMode2').classList.toggle('text-indigo-600', mode === 2);
+            document.getElementById('tabMode2').classList.toggle('border-transparent', mode !== 2);
+            document.getElementById('tabMode2').classList.toggle('text-slate-500', mode !== 2);
+
             if (mode === 1) {
-                tabMode1.className = "flex-1 py-4 text-sm font-medium border-b-2 border-indigo-600 text-indigo-600 transition-colors";
-                tabMode2.className = "flex-1 py-4 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors";
-                
-                dynamicLabel.textContent = "Цена продажи объекта (₽)";
-                dynamicInput.placeholder = "Например 15000000";
-                dynamicInput.value = "";
-                dynamicInput.classList.remove('bg-amber-50', 'border-amber-300');
+                document.getElementById('dynamicLabel').textContent = "Цена продажи объекта";
+                document.getElementById('dynamicInput').value = "";
             } else {
-                tabMode2.className = "flex-1 py-4 text-sm font-medium border-b-2 border-indigo-600 text-indigo-600 transition-colors";
-                tabMode1.className = "flex-1 py-4 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors";
-                
-                dynamicLabel.textContent = "Желаемая доходность инв-ра (% годовых)";
-                dynamicInput.placeholder = "Например 35";
-                dynamicInput.value = "35";
-                dynamicInput.classList.add('bg-amber-50', 'border-amber-300');
+                document.getElementById('dynamicLabel').textContent = "Желаемая доходность инв-ра (% годовых)";
+                document.getElementById('dynamicInput').value = "35";
             }
+            isCalculated = false;
         }
 
-        function copyAppUrl() {
-            const url = window.location.href;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(url).then(showCopied).catch(fallbackCopyTextToClipboard);
+        function handleDeductibleTypeChange() {
+            const type = document.getElementById('deductibleType').value;
+            const input = document.getElementById('taxDeductibleValue');
+            if (type === 'percent') {
+                input.placeholder = "Например 80";
+                if (parseFloat(input.value) > 100) input.value = '80';
             } else {
-                fallbackCopyTextToClipboard();
-            }
-
-            function fallbackCopyTextToClipboard() {
-                const textArea = document.createElement("textarea");
-                textArea.value = url;
-                textArea.style.position = "fixed";
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showCopied();
-                } catch (err) {
-                    console.error('ошибка при копировании', err);
-                }
-                document.body.removeChild(textArea);
-            }
-
-            function showCopied() {
-                const btnText = document.getElementById('copyBtnText');
-                const originalText = btnText.innerText;
-                btnText.innerText = 'Ссылка скопирована!';
-                setTimeout(() => {
-                    btnText.innerText = originalText;
-                }, 2000);
+                input.placeholder = "Например 1500000";
             }
         }
 
-        function formatCurrency(num) {
-            return Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
-        }
-
-        function calculateTaxBase(dkp, buy, ren, isIp) {
+        function calculateTaxBase(dkp, buy, ren, isIp, deductibleValue, deductibleType) {
             if (isIp) {
-                return dkp - buy - (ren * 0.8);
-            } else {
-                return dkp - buy;
+                let deduction = deductibleType === 'percent' ? (ren * (deductibleValue / 100)) : deductibleValue;
+                return Math.max(0, dkp - buy - deduction);
+            }
+            return Math.max(0, dkp - buy);
+        }
+        
+        function formatMoney(num) {
+            return Math.round(num).toLocaleString('ru-RU').replace(/,/g, ' ');
+        }
+
+        function updateInvestorShare() {
+            const invAmt = parseFloat(document.getElementById('investorAmount').value) || 0;
+            const buyPr = parseFloat(document.getElementById('buyPrice').value) || 0;
+            const ren = parseFloat(document.getElementById('renovation').value) || 0;
+            const multField = document.getElementById('profitMultiplier');
+            
+            if (!multField) return;
+
+            const mult = parseFloat(multField.value) || 50;
+            document.getElementById('multDisplay').textContent = mult;
+            
+            const budget = buyPr + ren;
+            let finalShare = "";
+            
+            if (budget > 0 && invAmt > 0) {
+                let shareCalc = (invAmt / budget) * mult;
+                finalShare = parseFloat(shareCalc.toFixed(2));
+            }
+            document.getElementById('investorsShare').value = finalShare;
+        }
+
+        function autoRecalculate() {
+            updateInvestorShare();
+            if (isCalculated) {
+                calculateROI(false);
             }
         }
 
-        function calculateROI() {
-            const dynamicVal = parseFloat(dynamicInput.value);
+        function calculateROI(isManualClick) {
+            updateInvestorShare();
+
+            const dynamicVal = parseFloat(document.getElementById('dynamicInput').value);
             const buyPrice = parseFloat(document.getElementById('buyPrice').value);
             const renovation = parseFloat(document.getElementById('renovation').value) || 0;
             const dealDays = parseFloat(document.getElementById('dealDays').value);
             const investorAmount = parseFloat(document.getElementById('investorAmount').value);
             const investorsShare = parseFloat(document.getElementById('investorsShare').value);
             
+            const deductibleType = document.getElementById('deductibleType').value;
+            const deductibleValue = parseFloat(document.getElementById('taxDeductibleValue').value) || 0;
+            
             const rawDkpPrice = document.getElementById('dkpPrice').value;
             const isIp = document.querySelector('input[name="ownerType"]:checked').value === 'ip';
 
-            const errorBlock = document.getElementById('errorMessage');
-            const errorText = document.getElementById('errorText');
-
-            if (isNaN(dynamicVal) || isNaN(buyPrice) || isNaN(dealDays) || isNaN(investorAmount) || isNaN(investorsShare) || dealDays <= 0 || investorsShare <= 0) {
-                errorText.textContent = "Пожалуйста, заполните все основные поля.";
-                errorBlock.classList.remove('hidden');
+            if (isNaN(dynamicVal) || isNaN(buyPrice) || isNaN(dealDays) || isNaN(investorAmount) || isNaN(investorsShare)) {
+                if (isManualClick) {
+                    document.getElementById('errorMessage').classList.remove('hidden');
+                }
                 return;
             }
 
             let salePrice = 0;
-            const resRequiredSalePriceBlock = document.getElementById('resRequiredSalePriceBlock');
-            resRequiredSalePriceBlock.classList.add('hidden');
-
             if (currentMode === 1) {
                 salePrice = dynamicVal;
+                document.getElementById('resRequiredSalePriceBlock').classList.add('hidden');
             } else {
                 const requiredInvestorProfit = investorAmount * (dynamicVal / 100) * (dealDays / 365);
                 const requiredNetProfitProject = requiredInvestorProfit / (investorsShare / 100);
                 
                 let dkpPriceInput = parseFloat(rawDkpPrice);
-                let hasCustomDkp = !isNaN(dkpPriceInput) && rawDkpPrice.trim() !== "";
-
-                if (hasCustomDkp) {
-                    let taxBase = calculateTaxBase(dkpPriceInput, buyPrice, renovation, isIp);
-                    let tax = taxBase > 0 ? taxBase * 0.15 : 0;
-                    let requiredGrossMargin = requiredNetProfitProject + tax;
-                    salePrice = requiredGrossMargin + buyPrice + renovation;
+                if (!isNaN(dkpPriceInput) && rawDkpPrice.trim() !== "") {
+                    let taxBase = calculateTaxBase(dkpPriceInput, buyPrice, renovation, isIp, deductibleValue, deductibleType);
+                    let tax = Math.max(0, taxBase * 0.15);
+                    salePrice = (requiredNetProfitProject + tax) + buyPrice + renovation;
                 } else {
-                    let sp0 = requiredNetProfitProject + buyPrice + renovation;
-                    let baseAtSp0 = calculateTaxBase(sp0, buyPrice, renovation, isIp);
-                    
-                    if (baseAtSp0 <= 0) {
-                        salePrice = sp0;
-                    } else {
-                        if (isIp) {
-                            salePrice = (requiredNetProfitProject + 0.85 * buyPrice + 0.88 * renovation) / 0.85;
-                        } else {
-                            salePrice = (requiredNetProfitProject + 0.85 * buyPrice + renovation) / 0.85;
-                        }
-                    }
+                    let deduction = isIp ? (deductibleType === 'percent' ? renovation * (deductibleValue / 100) : deductibleValue) : 0;
+                    salePrice = (requiredNetProfitProject + 0.85*buyPrice + renovation - 0.15*deduction) / 0.85; 
                 }
-                resRequiredSalePriceBlock.classList.remove('hidden');
-                document.getElementById('resRequiredSalePrice').textContent = formatCurrency(salePrice);
+                document.getElementById('resRequiredSalePriceBlock').classList.remove('hidden');
+                document.getElementById('resRequiredSalePrice').textContent = formatMoney(salePrice);
             }
 
-            errorBlock.classList.add('hidden');
+            document.getElementById('errorMessage').classList.add('hidden');
+            isCalculated = true;
 
-            let parsedDkp = parseFloat(rawDkpPrice);
-            const finalDkpPrice = (!isNaN(parsedDkp) && rawDkpPrice.trim() !== "") ? parsedDkp : salePrice;
+            const finalDkpPrice = parseFloat(rawDkpPrice) || salePrice;
+            
+            const taxBaseIp = calculateTaxBase(finalDkpPrice, buyPrice, renovation, true, deductibleValue, deductibleType);
+            const taxIp = Math.max(0, taxBaseIp * 0.15);
+            const taxBaseFiz = calculateTaxBase(finalDkpPrice, buyPrice, renovation, false, deductibleValue, deductibleType);
+            const taxFiz = Math.max(0, taxBaseFiz * 0.15);
 
+            const tax = isIp ? taxIp : taxFiz;
             const grossMargin = salePrice - buyPrice - renovation;
-            const taxBase = calculateTaxBase(finalDkpPrice, buyPrice, renovation, isIp);
-            const tax = taxBase > 0 ? taxBase * 0.15 : 0;
             const netProfitProject = grossMargin - tax;
-            const totalProjectCosts = buyPrice + renovation;
-
-            let projectYieldPA = 0;
-            if (totalProjectCosts > 0) {
-                const projectYieldAbs = (netProfitProject / totalProjectCosts) * 100;
-                projectYieldPA = projectYieldAbs * (365 / dealDays);
-            }
-
             const investorProfit = netProfitProject * (investorsShare / 100);
-            const investorYieldAbs = (investorProfit / investorAmount) * 100;
-            const investorYieldPA = investorYieldAbs * (365 / dealDays);
+            
+            const projectYield = (netProfitProject / (buyPrice + renovation)) * (365 / dealDays) * 100;
+            const investorYield = (investorProfit / investorAmount) * (365 / dealDays) * 100;
 
-            document.getElementById('resTotalProfit').textContent = formatCurrency(netProfitProject);
-            document.getElementById('resInvestorProfit').textContent = formatCurrency(investorProfit);
-            document.getElementById('resTax').textContent = formatCurrency(tax);
-            
-            const yieldBlock = document.getElementById('projectYieldBlock');
-            const projectYieldEl = document.getElementById('resProjectYield');
-            projectYieldEl.textContent = projectYieldPA.toFixed(1) + "%";
-            
-            if (projectYieldPA < 20) {
-                yieldBlock.className = "bg-red-50 p-5 rounded-xl border border-red-300";
-                projectYieldEl.className = "text-xl font-bold text-red-700";
-                projectYieldEl.innerHTML = projectYieldPA.toFixed(1) + "% <span class='text-xs block mt-1 font-normal text-red-600 flex items-center gap-1'><svg class='w-3 h-3' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'></path></svg> Ниже нормы (20%)!</span>";
+            const diffTax = Math.abs(taxIp - taxFiz);
+            let summaryHtml = '';
+            if (diffTax > 0) {
+                const betterChoice = taxIp < taxFiz ? 'ИП' : 'Физ. лицо';
+                summaryHtml = `<div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-800 text-sm">
+                    <strong>💡 Умное резюме:</strong> Выгоднее оформить сделку на <strong>${betterChoice}</strong>. 
+                    Экономия на налогах составит <strong>${formatMoney(diffTax)}</strong>.
+                </div>`;
             } else {
-                yieldBlock.className = "bg-green-50 p-5 rounded-xl border border-green-200";
-                projectYieldEl.className = "text-xl font-bold text-green-700";
+                summaryHtml = `<div class="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-600 text-sm">
+                    <strong>💡 Умное резюме:</strong> В данном случае налог для ИП и Физ. лица одинаковый.
+                </div>`;
             }
+            document.getElementById('smartSummary').innerHTML = summaryHtml;
 
-            document.getElementById('resInvestorYield').innerHTML = investorYieldPA.toFixed(1) + "%";
-
-            // Умное резюме
-            const altIsIp = !isIp;
-            const altTaxBase = calculateTaxBase(finalDkpPrice, buyPrice, renovation, altIsIp);
-            const altTax = altTaxBase > 0 ? altTaxBase * 0.15 : 0;
-            const taxDiff = Math.abs(tax - altTax);
+            // ВЫВОД РЕЗУЛЬТАТОВ БЕЗ ФОРМИРОВАНИЯ ДАННЫХ ДЛЯ ОТЧЕТА
+            document.getElementById('resTotalProfit').textContent = formatMoney(netProfitProject);
+            document.getElementById('resInvestorProfit').textContent = formatMoney(investorProfit);
+            document.getElementById('resTax').textContent = formatMoney(tax);
+            document.getElementById('resProjectYield').textContent = projectYield.toFixed(0) + "%";
+            document.getElementById('resInvestorYield').textContent = investorYield.toFixed(0) + "%";
             
-            const summaryDiv = document.getElementById('smartSummary');
-            if (taxDiff > 1) { 
-                if (tax < altTax) {
-                    summaryDiv.className = "mt-6 p-5 rounded-xl text-sm leading-relaxed border bg-green-50 border-green-200 text-green-800";
-                    summaryDiv.innerHTML = `<span class="flex items-center gap-2 mb-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><strong>Выгодный выбор!</strong></span> Оформление на ${isIp ? 'ИП' : 'Физ. лицо'} экономит вам <strong>${formatCurrency(taxDiff)}</strong> на налогах по сравнению с ${altIsIp ? 'ИП' : 'Физ. лицом'}.`;
-                } else {
-                    summaryDiv.className = "mt-6 p-5 rounded-xl text-sm leading-relaxed border bg-amber-50 border-amber-200 text-amber-800";
-                    summaryDiv.innerHTML = `<span class="flex items-center gap-2 mb-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg><strong>Внимание:</strong></span> При оформлении на ${altIsIp ? 'ИП' : 'Физ. лицо'} вы бы сэкономили <strong>${formatCurrency(taxDiff)}</strong> на налогах. Рассмотрите этот вариант.`;
-                }
-            } else {
-                summaryDiv.className = "mt-6 p-5 rounded-xl text-sm leading-relaxed border bg-slate-50 border-slate-200 text-slate-700";
-                summaryDiv.innerHTML = `В данной сделке сумма налога одинакова как для ИП, так и для Физ. лица (${formatCurrency(tax)}).`;
-            }
-
             document.getElementById('results').classList.remove('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
         }
     </script>
 </body>
