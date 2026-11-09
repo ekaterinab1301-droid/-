@@ -1057,7 +1057,6 @@
             const dateStr = now.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             
-            const modeText = currentMode === 1 ? "Расчет доходности" : "Расчет требуемой цены";
             const finModelText = currentFinModel === 'investor' ? "Частный инвестор" : "Ипотека / кредит банка";
             
             const buyPrice = formatMoney(parseFloat(document.getElementById('buyPrice').value) || 0) + " ₽";
@@ -1078,20 +1077,74 @@
             const card4Val = document.getElementById('resCard4').textContent;
             const taxVal = document.getElementById('resTax').textContent;
 
-            const tableRows = document.getElementById('scenarioTableBody').innerHTML;
+            // Генерация адаптированных строк таблицы сценариев под ширину листа А4
+            const basePrice = (parseFloat(document.getElementById('dynamicInput').value) || 0);
+            let scenarios = [];
+            if (currentScenarioMode === 'percent') {
+                scenarios = [
+                  { name: 'Стресс (-15%)', price: Math.round(basePrice * 0.85) },
+                  { name: 'Пессимист (-10%)', price: Math.round(basePrice * 0.90) },
+                  { name: 'Консерватив (-5%)', price: Math.round(basePrice * 0.95) },
+                  { name: 'Базовый (100%)', price: Math.round(basePrice), isBase: true },
+                  { name: 'Оптимист (+5%)', price: Math.round(basePrice * 1.05) },
+                  { name: 'Максимум (+10%)', price: Math.round(basePrice * 1.10) },
+                  { name: 'Премиум (+15%)', price: Math.round(basePrice * 1.15) }
+                ];
+            } else {
+                scenarios = [
+                  { name: '-1,5 млн', price: Math.round(basePrice - 1500000) },
+                  { name: '-1,0 млн', price: Math.round(basePrice - 1000000) },
+                  { name: '-500 тыс.', price: Math.round(basePrice - 500000) },
+                  { name: 'Базовый', price: Math.round(basePrice), isBase: true },
+                  { name: '+500 тыс.', price: Math.round(basePrice + 500000) },
+                  { name: '+1,0 млн', price: Math.round(basePrice + 1000000) },
+                  { name: '+1,5 млн', price: Math.round(basePrice + 1500000) }
+                ];
+            }
+
+            const invAmtVal = parseFloat(document.getElementById('investorAmount').value) || 0;
+            let pdfTableRows = '';
+            scenarios.forEach(sc => {
+                const data = computeScenarioMetrics(sc.price);
+                const isBase = sc.isBase;
+                const bgStyle = isBase ? 'background: #eef2ff; font-weight: bold;' : 'background: #ffffff;';
+                const profitColor = data.netProfit >= 0 ? '#047857' : '#e11d48';
+                const invColor = data.investorProfit > 0 ? '#4338ca' : '#64748b';
+                const ipColor = data.ipProfit >= 0 ? '#3730a3' : '#e11d48';
+
+                let invYieldText = "—";
+                if (currentFinModel === 'investor') {
+                    invYieldText = invAmtVal > 0 ? (data.investorYield.toFixed(0) + "%") : "—";
+                } else {
+                    invYieldText = data.investorYield.toFixed(0) + "%";
+                }
+                const invProfitText = currentFinModel === 'investor' ? formatMoney(data.investorProfit) : "100% себе";
+
+                pdfTableRows += `
+                    <tr style="${bgStyle} border-bottom: 1px solid #e2e8f0;">
+                        <td style="padding: 4px 3px; font-weight: 600; color: #1e293b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${sc.name}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #334155; white-space: nowrap;">${formatMoney(sc.price)}</td>
+                        <td style="padding: 4px 3px; text-align: right; color: #fb7185; background: rgba(254, 242, 242, 0.4); white-space: nowrap;">${formatMoney(data.tax)}</td>
+                        <td style="padding: 4px 3px; text-align: right; font-weight: bold; color: ${profitColor}; white-space: nowrap;">${formatMoney(data.netProfit)}</td>
+                        <td style="padding: 4px 3px; text-align: center; font-weight: 600; color: #1e293b; white-space: nowrap;">${data.projectYield.toFixed(0)}%</td>
+                        <td style="padding: 4px 3px; text-align: right; font-weight: 600; color: ${invColor}; white-space: nowrap;">${invProfitText}</td>
+                        <td style="padding: 4px 3px; text-align: center; font-weight: 800; color: ${invColor}; white-space: nowrap;">${invYieldText}</td>
+                        <td style="padding: 4px 3px; text-align: right; font-weight: bold; color: ${ipColor}; white-space: nowrap;">${formatMoney(data.ipProfit)}</td>
+                    </tr>
+                `;
+            });
 
             let finDetailsHtml = "";
             if (currentFinModel === 'investor') {
-                const invAmtVal = parseFloat(document.getElementById('investorAmount').value) || 0;
                 const invAmt = invAmtVal > 0 ? (formatMoney(invAmtVal) + " ₽") : "Не указана (по доле)";
                 const mult = (document.getElementById('profitMultiplier').value || 55) + "%";
                 finDetailsHtml = `
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+                    <div style="background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
                         <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Параметры инвестора</h4>
-                        <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
-                            <tr><td style="padding: 2px 0; color: #64748b;">Сумма займа:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${invAmt}</td></tr>
-                            <tr><td style="padding: 2px 0; color: #64748b;">Доля прибыли инвестора:</td><td style="text-align: right; font-weight: bold; color: #4338ca;">${mult} чистой прибыли</td></tr>
-                            <tr><td style="padding: 2px 0; color: #64748b;">Доля ИП:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${100 - parseFloat(mult)}% чистой прибыли</td></tr>
+                        <table style="width: 100%; font-size: 11px; border-collapse: collapse; table-layout: fixed;">
+                            <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Сумма займа:</td><td style="width: 50%; text-align: right; font-weight: bold; color: #0f172a;">${invAmt}</td></tr>
+                            <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Доля прибыли инвестора:</td><td style="width: 50%; text-align: right; font-weight: bold; color: #4338ca;">${mult} чистой прибыли</td></tr>
+                            <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Доля ИП:</td><td style="width: 50%; text-align: right; font-weight: bold; color: #0f172a;">${100 - parseFloat(mult)}% чистой прибыли</td></tr>
                         </table>
                     </div>
                 `;
@@ -1102,98 +1155,98 @@
                 const monthly = document.getElementById('resMonthlyPayment').textContent;
                 const bankInt = document.getElementById('resBankInterest').textContent;
                 finDetailsHtml = `
-                    <div style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+                    <div style="background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
                         <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Параметры кредита / ипотеки</h4>
-                        <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
-                            <tr><td style="padding: 2px 0; color: #64748b;">Сумма кредита:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${formatMoney(loanAmount)} ₽</td></tr>
-                            <tr><td style="padding: 2px 0; color: #64748b;">Первоначальный взнос (ПВ):</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${formatMoney(downPayment)} ₽</td></tr>
-                            <tr><td style="padding: 2px 0; color: #64748b;">Ставка и срок:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${rate} | ${years}</td></tr>
-                            <tr><td style="padding: 2px 0; color: #64748b;">Ежемесячный платеж:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${monthly}</td></tr>
-                            <tr><td style="padding: 2px 0; color: #64748b;">Проценты банку за срок сделки:</td><td style="text-align: right; font-weight: bold; color: #e11d48;">${bankInt}</td></tr>
+                        <table style="width: 100%; font-size: 11px; border-collapse: collapse; table-layout: fixed;">
+                            <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Сумма кредита:</td><td style="width: 50%; text-align: right; font-weight: bold; color: #0f172a;">${formatMoney(loanAmount)} ₽</td></tr>
+                            <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Первоначальный взнос (ПВ):</td><td style="width: 50%; text-align: right; font-weight: bold; color: #0f172a;">${formatMoney(downPayment)} ₽</td></tr>
+                            <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Ставка и срок:</td><td style="width: 50%; text-align: right; font-weight: bold; color: #0f172a;">${rate} | ${years}</td></tr>
+                            <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Ежемесячный платеж:</td><td style="width: 50%; text-align: right; font-weight: bold; color: #0f172a;">${monthly}</td></tr>
+                            <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Проценты банку за срок сделки:</td><td style="width: 50%; text-align: right; font-weight: bold; color: #e11d48;">${bankInt}</td></tr>
                         </table>
                     </div>
                 `;
             }
 
             const pdfHtml = `
-                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 18px 22px; color: #0f172a; background: #ffffff; width: 720px; box-sizing: border-box; margin: 0 auto;">
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 16px 18px; color: #0f172a; background: #ffffff; width: 750px; box-sizing: border-box; margin: 0 auto;">
                     <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end;">
                         <div>
                             <span style="font-size: 10px; font-weight: 700; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.8px;">Инвестиционный отчет флиппинг-проекта</span>
-                            <h2 style="margin: 2px 0 0 0; font-size: 19px; color: #0f172a; font-weight: 800;">${variantTitle}</h2>
-                            <p style="margin: 2px 0 0 0; font-size: 11.5px; color: #64748b;">Партнер: <strong>Дмитрий</strong> | Модель: <strong>${finModelText}</strong></p>
+                            <h2 style="margin: 2px 0 0 0; font-size: 18px; color: #0f172a; font-weight: 800;">${variantTitle}</h2>
+                            <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Партнер: <strong>Дмитрий</strong> | Модель: <strong>${finModelText}</strong></p>
                         </div>
-                        <div style="text-align: right; font-size: 11px; color: #64748b;">
+                        <div style="text-align: right; font-size: 10.5px; color: #64748b;">
                             <p style="margin: 0;">Дата: <strong>${dateStr}</strong></p>
                             <p style="margin: 2px 0 0 0;">Время: ${timeStr}</p>
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
                             <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Фактический объект (Cash Flow)</h4>
-                            <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
-                                <tr><td style="padding: 2px 0; color: #64748b;">Покупка:</td><td style="text-align: right; font-weight: bold;">${buyPrice}</td></tr>
-                                <tr><td style="padding: 2px 0; color: #64748b;">План. ремонт:</td><td style="text-align: right; font-weight: bold;">${planRen}</td></tr>
-                                <tr><td style="padding: 2px 0; color: #64748b;">Факт. ремонт:</td><td style="text-align: right; font-weight: bold;">${ren}</td></tr>
-                                <tr><td style="padding: 2px 0; color: #64748b;">Срок сделки:</td><td style="text-align: right; font-weight: bold;">${days}</td></tr>
+                            <table style="width: 100%; font-size: 11px; border-collapse: collapse; table-layout: fixed;">
+                                <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Покупка:</td><td style="width: 50%; text-align: right; font-weight: bold;">${buyPrice}</td></tr>
+                                <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">План. ремонт:</td><td style="width: 50%; text-align: right; font-weight: bold;">${planRen}</td></tr>
+                                <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Факт. ремонт:</td><td style="width: 50%; text-align: right; font-weight: bold;">${ren}</td></tr>
+                                <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Срок сделки:</td><td style="width: 50%; text-align: right; font-weight: bold;">${days}</td></tr>
                             </table>
                         </div>
 
-                        <div style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <div style="background: #f8fafc; padding: 10px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
                             <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Налогообложение</h4>
-                            <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
-                                <tr><td style="padding: 2px 0; color: #64748b;">Режим расчета:</td><td style="text-align: right; font-weight: bold;">${taxDesc}</td></tr>
-                                <tr><td style="padding: 2px 0; color: #64748b;">Сумма налога:</td><td style="text-align: right; font-weight: bold; color: #b91c1c;">${taxVal}</td></tr>
+                            <table style="width: 100%; font-size: 11px; border-collapse: collapse; table-layout: fixed;">
+                                <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Режим расчета:</td><td style="width: 50%; text-align: right; font-weight: bold;">${taxDesc}</td></tr>
+                                <tr><td style="width: 50%; padding: 2px 0; color: #64748b;">Сумма налога:</td><td style="width: 50%; text-align: right; font-weight: bold; color: #b91c1c;">${taxVal}</td></tr>
                             </table>
                         </div>
                     </div>
 
                     ${finDetailsHtml}
 
-                    <h3 style="font-size: 12px; margin: 10px 0 6px 0; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Базовые финансовые результаты</h3>
+                    <h3 style="font-size: 11.5px; margin: 10px 0 6px 0; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Базовые финансовые результаты</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
-                        <div style="background: #f1f5f9; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #475569;">
-                            <span style="font-size: 10.5px; color: #64748b; display: block; margin-bottom: 2px;">${card1Label}</span>
-                            <span style="font-size: 16px; font-weight: 800; color: #0f172a;">${card1Val}</span>
+                        <div style="background: #f1f5f9; padding: 8px 12px; border-radius: 8px; border-left: 3px solid #475569;">
+                            <span style="font-size: 10px; color: #64748b; display: block; margin-bottom: 2px;">${card1Label}</span>
+                            <span style="font-size: 15px; font-weight: 800; color: #0f172a;">${card1Val}</span>
                         </div>
-                        <div style="background: #f1f5f9; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #475569;">
-                            <span style="font-size: 10.5px; color: #64748b; display: block; margin-bottom: 2px;">${card2Label}</span>
-                            <span style="font-size: 16px; font-weight: 800; color: #0f172a;">${card2Val}</span>
+                        <div style="background: #f1f5f9; padding: 8px 12px; border-radius: 8px; border-left: 3px solid #475569;">
+                            <span style="font-size: 10px; color: #64748b; display: block; margin-bottom: 2px;">${card2Label}</span>
+                            <span style="font-size: 15px; font-weight: 800; color: #0f172a;">${card2Val}</span>
                         </div>
-                        <div style="background: #eef2ff; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #4f46e5;">
-                            <span style="font-size: 10.5px; color: #4338ca; display: block; margin-bottom: 2px; font-weight: 600;">${card3Label}</span>
-                            <span style="font-size: 16px; font-weight: 800; color: #3730a3;">${card3Val}</span>
+                        <div style="background: #eef2ff; padding: 8px 12px; border-radius: 8px; border-left: 3px solid #4f46e5;">
+                            <span style="font-size: 10px; color: #4338ca; display: block; margin-bottom: 2px; font-weight: 600;">${card3Label}</span>
+                            <span style="font-size: 15px; font-weight: 800; color: #3730a3;">${card3Val}</span>
                         </div>
-                        <div style="background: #eef2ff; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #4f46e5;">
-                            <span style="font-size: 10.5px; color: #4338ca; display: block; margin-bottom: 2px; font-weight: 600;">${card4Label}</span>
-                            <span style="font-size: 16px; font-weight: 800; color: #3730a3;">${card4Val}</span>
+                        <div style="background: #eef2ff; padding: 8px 12px; border-radius: 8px; border-left: 3px solid #4f46e5;">
+                            <span style="font-size: 10px; color: #4338ca; display: block; margin-bottom: 2px; font-weight: 600;">${card4Label}</span>
+                            <span style="font-size: 15px; font-weight: 800; color: #3730a3;">${card4Val}</span>
                         </div>
                     </div>
 
-                    <!-- Сводная таблица сценариев в PDF (компактная версия) -->
-                    <h3 style="font-size: 12px; margin: 10px 0 6px 0; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Сводная таблица сценариев реализации (в рублях)</h3>
-                    <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 12px;">
-                        <table style="width: 100%; font-size: 9.5px; border-collapse: collapse; text-align: left;">
+                    <!-- Сводная таблица сценариев: строго 8 колонок с четкими процентами -->
+                    <h3 style="font-size: 11.5px; margin: 10px 0 6px 0; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Сводная таблица сценариев реализации (в рублях)</h3>
+                    <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 10px;">
+                        <table style="width: 100%; font-size: 9px; border-collapse: collapse; table-layout: fixed;">
                             <thead>
                                 <tr style="background: #f1f5f9; color: #334155; border-bottom: 1px solid #cbd5e1;">
-                                    <th style="padding: 5px 4px;">Сценарий</th>
-                                    <th style="padding: 5px 4px;">Цена продажи</th>
-                                    <th style="padding: 5px 4px; color: #fb7185; font-weight: normal;">Налог</th>
-                                    <th style="padding: 5px 4px;">Прибыль</th>
-                                    <th style="padding: 5px 4px;">Доходность</th>
-                                    <th style="padding: 5px 4px;">${currentFinModel === 'investor' ? 'Доход инв.' : 'Прибыль'}</th>
-                                    <th style="padding: 5px 4px;">${currentFinModel === 'investor' ? '% инв.' : 'ROE'}</th>
-                                    <th style="padding: 5px 4px;">Доход ИП</th>
+                                    <th style="width: 16%; padding: 5px 3px; text-align: left;">Сценарий</th>
+                                    <th style="width: 14%; padding: 5px 3px; text-align: right;">Цена продажи</th>
+                                    <th style="width: 10%; padding: 5px 3px; text-align: right; color: #fb7185;">Налог</th>
+                                    <th style="width: 13%; padding: 5px 3px; text-align: right;">Прибыль</th>
+                                    <th style="width: 9%; padding: 5px 3px; text-align: center;">Доходн.</th>
+                                    <th style="width: 13%; padding: 5px 3px; text-align: right;">${currentFinModel === 'investor' ? 'Доход инв.' : 'Прибыль'}</th>
+                                    <th style="width: 10%; padding: 5px 3px; text-align: center;">${currentFinModel === 'investor' ? '% инв.' : 'ROE'}</th>
+                                    <th style="width: 15%; padding: 5px 3px; text-align: right;">Доход ИП</th>
                                 </tr>
                             </thead>
-                            <tbody style="line-height: 1.3;">
-                                ${tableRows}
+                            <tbody style="line-height: 1.35;">
+                                ${pdfTableRows}
                             </tbody>
                         </table>
                     </div>
 
-                    <div style="border-top: 1px solid #e2e8f0; padding-top: 6px; display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                    <div style="border-top: 1px solid #e2e8f0; padding-top: 6px; display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
                         <span>Калькулятор инвестиционной доходности</span>
                         <span>Документ сформирован автоматически для Дмитрия</span>
                     </div>
@@ -1202,13 +1255,17 @@
 
             const container = document.getElementById('pdfExportContainer');
             container.innerHTML = pdfHtml;
-            container.style.position = 'fixed';
+            container.style.position = 'absolute';
             container.style.left = '0';
             container.style.top = '0';
-            container.style.width = '100%';
-            container.style.zIndex = '-9999';
-            container.style.opacity = '1';
+            container.style.width = '750px';
+            container.style.minWidth = '750px';
+            container.style.maxWidth = '750px';
+            container.style.zIndex = '99999';
+            container.style.background = '#ffffff';
+            container.style.overflow = 'visible';
             container.classList.remove('hidden');
+            container.style.display = 'block';
 
             const safeFileName = variantTitle.replace(/[^a-zA-Z0-9а-яА-ЯёЁ_-]/g, '_').substring(0, 40);
             const opt = {
@@ -1223,7 +1280,8 @@
                     scrollY: 0,
                     x: 0,
                     y: 0,
-                    windowWidth: 1024
+                    windowWidth: 750,
+                    width: 750
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
@@ -1232,6 +1290,7 @@
                 if (window.html2pdf) {
                     html2pdf().set(opt).from(container.firstElementChild).save().then(() => {
                         container.classList.add('hidden');
+                        container.style.display = 'none';
                         container.innerHTML = "";
                         window.scrollTo(prevScrollX, prevScrollY);
                         btn.disabled = false;
@@ -1239,6 +1298,9 @@
                         setTimeout(() => { btnText.textContent = originalText; }, 2500);
                     }).catch(err => {
                         console.error("PDF export error:", err);
+                        container.classList.add('hidden');
+                        container.style.display = 'none';
+                        container.innerHTML = "";
                         window.scrollTo(prevScrollX, prevScrollY);
                         fallbackPrint(container, btn, btnText, originalText);
                     });
@@ -1246,7 +1308,7 @@
                     window.scrollTo(prevScrollX, prevScrollY);
                     fallbackPrint(container, btn, btnText, originalText);
                 }
-            }, 250);
+            }, 300);
         }
 
         function fallbackPrint(container, btn, btnText, originalText) {
