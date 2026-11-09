@@ -81,20 +81,20 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                             <label id="dynamicLabel" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Базовая цена продажи объекта</label>
-                            <input type="number" id="dynamicInput" value="13500000" placeholder="Например 13500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="dynamicInput" value="" placeholder="Например 13500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Фактическая цена покупки</label>
-                            <input type="number" id="buyPrice" value="10000000" placeholder="Например 10000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="buyPrice" value="" placeholder="Например 10000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Плановые расходы на ремонт</label>
-                            <input type="number" id="planRenovation" value="1500000" placeholder="Например 1500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="planRenovation" value="" placeholder="Например 1500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                             <p class="text-[11px] text-slate-400 mt-1">Используется для расчета справедливой доли инвестора</p>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Фактические расходы на ремонт</label>
-                            <input type="number" id="renovation" value="1500000" placeholder="Например 1500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="renovation" value="" placeholder="Например 1500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                             <p class="text-[11px] text-slate-400 mt-1">Реальные затраты на стройку, материалы и комплектацию</p>
                         </div>
                         <div class="md:col-span-2">
@@ -102,7 +102,7 @@
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Срок сделки (в днях)</label>
                                 <button type="button" onclick="toggleDateInputs()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium border-b border-dashed border-indigo-400 transition-colors">Рассчитать по датам</button>
                             </div>
-                            <input type="number" id="dealDays" value="120" placeholder="Например 120" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="dealDays" value="" placeholder="Например 120" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                             
                             <!-- Блок расчета дат -->
                             <div id="dateCalcBlock" class="hidden mt-3 grid grid-cols-2 gap-3 p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-xl">
@@ -218,7 +218,7 @@
                     <div id="investorSection" class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Сумма займа (инвестиций)</label>
-                            <input type="number" id="investorAmount" value="4500000" placeholder="Например 4500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="investorAmount" value="" placeholder="Например 4500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
@@ -265,7 +265,7 @@
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Доп. расходы по сделке / кредиту (₽)</label>
-                            <input type="number" id="mortgageExtraCosts" value="50000" placeholder="Например 50000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="mortgageExtraCosts" value="" placeholder="Например 50000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                             <p class="text-[11px] text-slate-500 mt-1">Оценка, страховка, брокер, аккредитив</p>
                         </div>
                     </div>
@@ -360,7 +360,6 @@
                                     <th class="py-2.5 px-3 font-semibold">Доходность проекта</th>
                                     <th class="py-2.5 px-3 font-semibold" id="colHeaderInvProfit">Прибыль инвестора</th>
                                     <th class="py-2.5 px-3 font-semibold" id="colHeaderInvYield">Доходность инв-ра</th>
-                                    <th class="py-2.5 px-3 font-semibold" id="colHeaderFlipper">Прибыль флиппера</th>
                                 </tr>
                             </thead>
                             <tbody id="scenarioTableBody" class="divide-y divide-slate-100">
@@ -514,18 +513,13 @@
             if (currentMode === 1) {
                 label.textContent = "Базовая цена продажи объекта";
                 input.placeholder = "Например 13500000";
-                if (input.value === "35" || input.value === "80" || input.value === "100") {
-                    input.value = "13500000";
-                }
             } else {
                 if (currentFinModel === 'investor') {
                     label.textContent = "Желаемая доходность инв-ра (% годовых)";
                     input.placeholder = "Например 35";
-                    if (!input.value || input.value > 200) input.value = "35";
                 } else {
                     label.textContent = "Желаемая доходность на капитал (ROE, % годовых)";
                     input.placeholder = "Например 80";
-                    if (!input.value || input.value === "35") input.value = "80";
                 }
             }
         }
@@ -782,7 +776,7 @@
                 colInvProfit.textContent = "Прибыль инвестора";
                 colInvYield.textContent = "Доходность инв-ра";
             } else {
-                colInvProfit.textContent = "Кредитное плечо";
+                colInvProfit.textContent = "Чистая прибыль";
                 colInvYield.textContent = "🔥 ROE на капитал";
             }
 
@@ -807,7 +801,6 @@
                     <td class="py-2.5 px-3 font-semibold text-slate-800" style="white-space: nowrap;">${data.projectYield.toFixed(0)}% год.</td>
                     <td class="py-2.5 px-3 ${currentFinModel === 'investor' ? 'text-indigo-700 font-semibold' : 'text-slate-500'}" style="white-space: nowrap;">${invProfitText}</td>
                     <td class="py-2.5 px-3 font-extrabold ${currentFinModel === 'investor' ? 'text-indigo-700' : 'text-blue-700'}" style="white-space: nowrap;">${invYieldText}</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800" style="white-space: nowrap;">${formatMoney(data.flipperProfit)} ₽</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1153,9 +1146,8 @@
                                     <th style="padding: 5px 7px;">Цена продажи</th>
                                     <th style="padding: 5px 7px;">Прибыль проекта</th>
                                     <th style="padding: 5px 7px;">Доходность</th>
-                                    <th style="padding: 5px 7px;">Доход инвестора</th>
-                                    <th style="padding: 5px 7px;">% инвестора</th>
-                                    <th style="padding: 5px 7px;">Прибыль флиппера</th>
+                                    <th style="padding: 5px 7px;">${currentFinModel === 'investor' ? 'Доход инвестора' : 'Чистая прибыль'}</th>
+                                    <th style="padding: 5px 7px;">${currentFinModel === 'investor' ? '% инвестора' : 'ROE'}</th>
                                 </tr>
                             </thead>
                             <tbody style="line-height: 1.35;">
