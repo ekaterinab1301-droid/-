@@ -26,7 +26,7 @@
     
     <!-- ПЛАШКА КОПИРОВАНИЯ ССЫЛКИ -->
     <div class="max-w-4xl mx-auto flex justify-end mb-4">
-        <button id="copyLinkBtn" onclick="copyCalculatorLink()" class="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200">
+        <button id="copyLinkBtn" onclick="copyCalculatorLink()" class="flex items-center gap-2 text-xs md:text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
             <span id="copyLinkText">Скопировать ссылку</span>
         </button>
@@ -42,10 +42,10 @@
                     Расчет инвестиционной доходности
                 </h1>
                 <span class="hidden sm:inline-block text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 px-3 py-1 rounded-full font-medium">
-                    2-контурный учет
+                    Сводный сценарный анализ
                 </span>
             </div>
-            <p class="text-slate-300 mt-2 text-sm md:text-base">Раздельный расчет реального денежного потока (Cash Flow) и налогообложения по ДКП.</p>
+            <p class="text-slate-300 mt-2 text-sm md:text-base">Раздельный расчет реального денежного потока (Cash Flow), налогов по ДКП и матрица сценариев по цене продажи.</p>
         </div>
 
         <!-- Вкладки режимов расчета -->
@@ -77,21 +77,21 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
-                            <label id="dynamicLabel" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Цена продажи объекта</label>
-                            <input type="number" id="dynamicInput" placeholder="Например 15000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <label id="dynamicLabel" class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Базовая цена продажи объекта</label>
+                            <input type="number" id="dynamicInput" value="13500000" placeholder="Например 13500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Фактическая цена покупки</label>
-                            <input type="number" id="buyPrice" placeholder="Например 10000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="buyPrice" value="10000000" placeholder="Например 10000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Плановые расходы на ремонт</label>
-                            <input type="number" id="planRenovation" placeholder="Например 2000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
-                            <p class="text-[11px] text-slate-400 mt-1">Используется для фиксации справедливой доли инвестора</p>
+                            <input type="number" id="planRenovation" value="1500000" placeholder="Например 1500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <p class="text-[11px] text-slate-400 mt-1">Используется для расчета справедливой доли инвестора</p>
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Фактические расходы на ремонт</label>
-                            <input type="number" id="renovation" placeholder="Например 2000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="renovation" value="1500000" placeholder="Например 1500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                             <p class="text-[11px] text-slate-400 mt-1">Реальные затраты на стройку, материалы и комплектацию</p>
                         </div>
                         <div class="md:col-span-2">
@@ -99,7 +99,7 @@
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Срок сделки (в днях)</label>
                                 <button type="button" onclick="toggleDateInputs()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium border-b border-dashed border-indigo-400 transition-colors">Рассчитать по датам</button>
                             </div>
-                            <input type="number" id="dealDays" placeholder="Например 90" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="dealDays" value="120" placeholder="Например 120" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                             
                             <!-- Блок расчета дат -->
                             <div id="dateCalcBlock" class="hidden mt-3 grid grid-cols-2 gap-3 p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-xl">
@@ -173,14 +173,11 @@
                                 <label class="block text-xs font-bold text-indigo-900 uppercase tracking-wider mb-1">Продажа по ДКП</label>
                                 <input type="number" id="sellPriceDkp" placeholder="По умолч. факт. продажа" oninput="autoRecalculate()" class="w-full p-2.5 bg-white border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-medium">
                             </div>
-                            <p class="text-xs text-indigo-700 md:col-span-2">
-                                💡 Налог считается строго от разницы сумм в ДКП, а реальная прибыль флиппера и инвестора рассчитывается от фактических денежных потоков.
-                            </p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Цена продажи в ДКП (официальная)</label>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Цена продажи по ДКП (официальная)</label>
                                 <input type="number" id="dkpPrice" placeholder="По умолч. цена продажи" oninput="autoRecalculate()" class="w-full p-3 bg-white border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm">
                             </div>
                             <div class="bg-blue-50/70 p-3 rounded-xl border border-blue-200">
@@ -214,17 +211,20 @@
                         </button>
                     </div>
 
-                    <!-- Параметры инвестора -->
+                    <!-- Параметры инвестора: расширенная линейка 40, 45, 50, 55, 60, 70 -->
                     <div id="investorSection" class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Сумма займа (инвестиций)</label>
-                            <input type="number" id="investorAmount" placeholder="Например 12000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="investorAmount" value="4500000" placeholder="Например 4500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Доля прибыли инвестора (%)</label>
                                 <select id="profitMultiplier" onchange="autoRecalculate()" class="text-xs bg-indigo-50 border border-indigo-200 rounded px-1.5 py-0.5 text-indigo-800 font-bold outline-none cursor-pointer">
+                                    <option value="40">Условия: 40%</option>
+                                    <option value="45">Условия: 45%</option>
                                     <option value="50">Условия: 50%</option>
+                                    <option value="55">Условия: 55%</option>
                                     <option value="60" selected>Условия: 60%</option>
                                     <option value="70">Условия: 70%</option>
                                 </select>
@@ -251,12 +251,12 @@
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Ставка банка (% годовых)</label>
-                            <input type="number" id="mortgageRate" value="20" step="0.1" placeholder="Например 20" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="mortgageRate" value="21" step="0.5" placeholder="Например 21" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                         </div>
 
                         <div>
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Срок кредита (в годах)</label>
-                            <input type="number" id="mortgageYears" value="30" placeholder="Например 30" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
+                            <input type="number" id="mortgageYears" value="25" placeholder="Например 25" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                             <p class="text-[11px] text-slate-500 mt-1">Ипотека: 20–30 лет | Потребкредит / бизнес: 3–5 лет</p>
                         </div>
 
@@ -332,12 +332,48 @@
                 <!-- Умное резюме -->
                 <div id="smartSummary" class="mt-4"></div>
 
+                <!-- СВОДНАЯ ТАБЛИЦА СЦЕНАРИЕВ: 7 ШАГОВ -->
+                <div id="scenarioSection" class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <span>📊</span> Сводная таблица сценариев по цене продажи
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Сравнение чистой прибыли и доходности при разных вариантах реализации</p>
+                        </div>
+                        <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                            <button type="button" id="btnScenPercent" onclick="switchScenarioMode('percent')" class="px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all">±15% (шаг 5%)</button>
+                            <button type="button" id="btnScenStep" onclick="switchScenarioMode('step')" class="px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Шаг 500 000 ₽</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
+                                    <th class="py-2.5 px-3 font-semibold">Сценарий</th>
+                                    <th class="py-2.5 px-3 font-semibold">Цена продажи</th>
+                                    <th class="py-2.5 px-3 font-semibold">Прибыль проекта</th>
+                                    <th class="py-2.5 px-3 font-semibold">Доходность проекта</th>
+                                    <th class="py-2.5 px-3 font-semibold" id="colHeaderInvProfit">Прибыль инвестора</th>
+                                    <th class="py-2.5 px-3 font-semibold" id="colHeaderInvYield">Доходность инв-ра</th>
+                                    <th class="py-2.5 px-3 font-semibold" id="colHeaderFlipper">Прибыль флиппера</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scenarioTableBody" class="divide-y divide-slate-100">
+                                <!-- Автоматическая генерация -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-[11px] text-slate-400">💡 Доходность проекта и инвесторов пересчитана в % годовых с учетом фактического срока сделки.</p>
+                </div>
+
                 <!-- БЛОК ЭКСПОРТА В PDF -->
                 <div class="mt-6 pt-5 border-t border-slate-200">
                     <div class="bg-gradient-to-r from-indigo-50 to-slate-50 p-4 md:p-5 rounded-2xl border border-indigo-100 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
                         <div class="flex-1">
                             <label class="block text-xs font-bold text-indigo-950 uppercase tracking-wider mb-1">Название расчета / объект (для PDF)</label>
-                            <input type="text" id="pdfVariantTitle" placeholder="Например: ул. Мира, 12 — Вариант с кредитом" class="w-full p-2.5 bg-white border border-indigo-200 rounded-xl text-sm text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm">
+                            <input type="text" id="pdfVariantTitle" value="Квартира: сводный инвестиционный расчет" class="w-full p-2.5 bg-white border border-indigo-200 rounded-xl text-sm text-slate-800 outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm">
                         </div>
                         <button type="button" id="btnSavePdf" onclick="exportCalculationToPDF()" class="shrink-0 bg-slate-900 hover:bg-slate-800 active:scale-[0.98] text-white font-semibold px-5 py-3 rounded-xl shadow-md transition-all flex items-center justify-center gap-2.5 text-sm md:self-end">
                             <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -355,6 +391,7 @@
     <script>
         let currentMode = 1; // 1: Узнать доходность, 2: Узнать цену продажи
         let currentFinModel = 'investor'; // 'investor' или 'mortgage'
+        let currentScenarioMode = 'percent'; // 'percent' или 'step'
         let isCalculated = false;
 
         function copyCalculatorLink() {
@@ -434,6 +471,22 @@
             autoRecalculate();
         }
 
+        function switchScenarioMode(mode) {
+            currentScenarioMode = mode;
+            const btnP = document.getElementById('btnScenPercent');
+            const btnS = document.getElementById('btnScenStep');
+            if (mode === 'percent') {
+                btnP.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all";
+                btnS.className = "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+            } else {
+                btnS.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all";
+                btnP.className = "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+            }
+            if (isCalculated) {
+                renderScenarioTable();
+            }
+        }
+
         function switchMode(mode) {
             currentMode = mode;
             document.getElementById('results').classList.add('hidden');
@@ -456,10 +509,10 @@
             const input = document.getElementById('dynamicInput');
 
             if (currentMode === 1) {
-                label.textContent = "Цена продажи объекта";
-                input.placeholder = "Например 15000000";
+                label.textContent = "Базовая цена продажи объекта";
+                input.placeholder = "Например 13500000";
                 if (input.value === "35" || input.value === "80" || input.value === "100") {
-                    input.value = "";
+                    input.value = "13500000";
                 }
             } else {
                 if (currentFinModel === 'investor') {
@@ -497,8 +550,8 @@
                 input.value = "20";
             } else if (type === 'credit_sum') {
                 if (label) label.textContent = "Сумма кредита (₽)";
-                input.placeholder = "Например 3000000";
-                input.value = buyPr > 0 ? Math.round(buyPr * 0.5) : 3000000;
+                input.placeholder = "Например 7000000";
+                input.value = buyPr > 0 ? Math.round(buyPr * 0.7) : 7000000;
             } else {
                 if (label) label.textContent = "Сумма ПВ (₽)";
                 input.placeholder = "Например 2000000";
@@ -596,6 +649,169 @@
             }
         }
 
+        // Функция единичного расчета под произвольную цену продажи (для сводной таблицы)
+        function computeScenarioMetrics(candidateSellPrice) {
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value) || 0;
+            const renovation = parseFloat(document.getElementById('renovation').value) || 0;
+            const dealDays = Math.max(1, parseFloat(document.getElementById('dealDays').value) || 1);
+            
+            const isManualTax = document.getElementById('manualTaxToggle').checked;
+            const manualTaxVal = parseFloat(document.getElementById('manualTaxInput').value) || 0;
+
+            const isDkpDiff = document.getElementById('dkpDiffToggle').checked;
+            const buyPriceDkpInput = parseFloat(document.getElementById('buyPriceDkp').value);
+            const sellPriceDkpInput = parseFloat(document.getElementById('sellPriceDkp').value);
+            const rawDkpPrice = document.getElementById('dkpPrice').value;
+            const isIp = document.querySelector('input[name="ownerType"]:checked').value === 'ip';
+
+            const deductibleType = document.getElementById('deductibleType').value;
+            const deductibleValue = parseFloat(document.getElementById('taxDeductibleValue').value) || 0;
+
+            const { downPayment, loanAmount } = updateMortgagePreview();
+
+            let bankInterest = 0;
+            let ownCapital = 0;
+            let mortgageExtraCosts = 0;
+
+            if (currentFinModel === 'mortgage') {
+                const mortgageRate = parseFloat(document.getElementById('mortgageRate').value) || 0;
+                const mortgageYears = parseFloat(document.getElementById('mortgageYears').value) || 25;
+                mortgageExtraCosts = parseFloat(document.getElementById('mortgageExtraCosts').value) || 0;
+
+                const monthlyPayment = calculateAnnuity(loanAmount, mortgageRate, mortgageYears);
+                bankInterest = loanAmount * (mortgageRate / 100) * (dealDays / 365);
+                const monthsInDeal = Math.max(1, Math.ceil(dealDays / 30.4167));
+                ownCapital = downPayment + renovation + mortgageExtraCosts + (monthlyPayment * monthsInDeal);
+            } else {
+                ownCapital = buyPrice + renovation;
+            }
+
+            // Налог
+            let tax = 0;
+            if (isManualTax) {
+                tax = manualTaxVal;
+            } else {
+                const effectiveBuyDkp = (isDkpDiff && !isNaN(buyPriceDkpInput)) ? buyPriceDkpInput : buyPrice;
+                let effectiveSellDkp = candidateSellPrice;
+                if (isDkpDiff && !isNaN(sellPriceDkpInput)) {
+                    const baseInput = parseFloat(document.getElementById('dynamicInput').value) || candidateSellPrice;
+                    const ratio = baseInput > 0 ? (candidateSellPrice / baseInput) : 1;
+                    effectiveSellDkp = sellPriceDkpInput * ratio;
+                } else if (rawDkpPrice.trim() !== "" && !isNaN(parseFloat(rawDkpPrice))) {
+                    effectiveSellDkp = parseFloat(rawDkpPrice);
+                }
+
+                const taxBase = calculateTaxBase(effectiveSellDkp, effectiveBuyDkp, renovation, isIp, deductibleValue, deductibleType, bankInterest, mortgageExtraCosts);
+                tax = Math.max(0, taxBase * 0.15);
+            }
+
+            let netProfitProject = 0;
+            let projectYield = 0;
+            let investorProfit = 0;
+            let investorYield = 0;
+            let flipperProfit = 0;
+
+            if (currentFinModel === 'investor') {
+                const investorAmount = parseFloat(document.getElementById('investorAmount').value) || 0;
+                const investorsShare = parseFloat(document.getElementById('investorsShare').value) || 0;
+
+                netProfitProject = candidateSellPrice - buyPrice - renovation - tax;
+                projectYield = ownCapital > 0 ? (netProfitProject / ownCapital) * (365 / dealDays) * 100 : 0;
+
+                investorProfit = Math.max(0, netProfitProject * (investorsShare / 100));
+                flipperProfit = netProfitProject - investorProfit;
+
+                if (investorAmount > 0) {
+                    investorYield = (investorProfit / investorAmount) * (365 / dealDays) * 100;
+                }
+            } else {
+                const totalExpenses = buyPrice + renovation + bankInterest + mortgageExtraCosts;
+                netProfitProject = candidateSellPrice - totalExpenses - tax;
+                projectYield = totalExpenses > 0 ? (netProfitProject / totalExpenses) * (365 / dealDays) * 100 : 0;
+                const roe = ownCapital > 0 ? (netProfitProject / ownCapital) * (365 / dealDays) * 100 : 0;
+                
+                flipperProfit = netProfitProject;
+                investorYield = roe;
+            }
+
+            return {
+                sellPrice: candidateSellPrice,
+                netProfit: netProfitProject,
+                projectYield: projectYield,
+                investorProfit: investorProfit,
+                investorYield: investorYield,
+                flipperProfit: flipperProfit,
+                tax: tax
+            };
+        }
+
+        function renderScenarioTable(baseSalePrice) {
+            const basePrice = baseSalePrice || (parseFloat(document.getElementById('dynamicInput').value) || 0);
+            if (basePrice <= 0) return;
+
+            let scenarios = [];
+            if (currentScenarioMode === 'percent') {
+                scenarios = [
+                  { name: 'Стресс-сценарий (-15%)', price: Math.round(basePrice * 0.85) },
+                  { name: 'Пессимистичный (-10%)', price: Math.round(basePrice * 0.90) },
+                  { name: 'Консервативный (-5%)', price: Math.round(basePrice * 0.95) },
+                  { name: 'Базовый расчет', price: Math.round(basePrice), isBase: true },
+                  { name: 'Оптимистичный (+5%)', price: Math.round(basePrice * 1.05) },
+                  { name: 'Максимальный (+10%)', price: Math.round(basePrice * 1.10) },
+                  { name: 'Премиальный (+15%)', price: Math.round(basePrice * 1.15) }
+                ];
+            } else {
+                scenarios = [
+                  { name: 'Снижение на 1,5 млн ₽', price: Math.round(basePrice - 1500000) },
+                  { name: 'Снижение на 1 млн ₽', price: Math.round(basePrice - 1000000) },
+                  { name: 'Снижение на 500 тыс. ₽', price: Math.round(basePrice - 500000) },
+                  { name: 'Базовый расчет', price: Math.round(basePrice), isBase: true },
+                  { name: 'Рост на 500 тыс. ₽', price: Math.round(basePrice + 500000) },
+                  { name: 'Рост на 1 млн ₽', price: Math.round(basePrice + 1000000) },
+                  { name: 'Рост на 1,5 млн ₽', price: Math.round(basePrice + 1500000) }
+                ];
+            }
+
+            const tbody = document.getElementById('scenarioTableBody');
+            tbody.innerHTML = '';
+
+            const colInvProfit = document.getElementById('colHeaderInvProfit');
+            const colInvYield = document.getElementById('colHeaderInvYield');
+            if (currentFinModel === 'investor') {
+                colInvProfit.textContent = "Прибыль инвестора";
+                colInvYield.textContent = "Доходность инв-ра";
+            } else {
+                colInvProfit.textContent = "Кредитное плечо";
+                colInvYield.textContent = "🔥 ROE на капитал";
+            }
+
+            scenarios.forEach(sc => {
+                const data = computeScenarioMetrics(sc.price);
+                const tr = document.createElement('tr');
+                
+                if (sc.isBase) {
+                    tr.className = "bg-indigo-50/80 font-bold border-l-4 border-indigo-600 text-indigo-950";
+                } else {
+                    tr.className = "hover:bg-slate-50 transition-colors text-slate-700";
+                }
+
+                const profitClass = data.netProfit >= 0 ? "text-emerald-700 font-bold" : "text-rose-600 font-bold";
+                const invProfitText = currentFinModel === 'investor' ? formatMoney(data.investorProfit) + " ₽" : "100% себе";
+                const invYieldText = data.investorYield.toFixed(0) + "% год.";
+
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 font-semibold" style="white-space: nowrap;">${sc.name}</td>
+                    <td class="py-2.5 px-3" style="white-space: nowrap;">${formatMoney(sc.price)} ₽</td>
+                    <td class="py-2.5 px-3 ${profitClass}" style="white-space: nowrap;">${formatMoney(data.netProfit)} ₽</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800" style="white-space: nowrap;">${data.projectYield.toFixed(0)}% год.</td>
+                    <td class="py-2.5 px-3 ${currentFinModel === 'investor' ? 'text-indigo-700 font-semibold' : 'text-slate-500'}" style="white-space: nowrap;">${invProfitText}</td>
+                    <td class="py-2.5 px-3 font-extrabold ${currentFinModel === 'investor' ? 'text-indigo-700' : 'text-blue-700'}" style="white-space: nowrap;">${invYieldText}</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-800" style="white-space: nowrap;">${formatMoney(data.flipperProfit)} ₽</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
         function calculateROI(isManualClick) {
             updateInvestorShare();
             const { downPayment, loanAmount } = updateMortgagePreview();
@@ -626,7 +842,7 @@
             let investorAmount = 0;
             let investorsShare = 0;
             let mortgageRate = 0;
-            let mortgageYears = 30;
+            let mortgageYears = 25;
             let mortgageExtraCosts = 0;
             let monthlyPayment = 0;
             let bankInterest = 0;
@@ -641,7 +857,7 @@
                 }
             } else {
                 mortgageRate = parseFloat(document.getElementById('mortgageRate').value) || 0;
-                mortgageYears = parseFloat(document.getElementById('mortgageYears').value) || 30;
+                mortgageYears = parseFloat(document.getElementById('mortgageYears').value) || 25;
                 mortgageExtraCosts = parseFloat(document.getElementById('mortgageExtraCosts').value) || 0;
 
                 monthlyPayment = calculateAnnuity(loanAmount, mortgageRate, mortgageYears);
@@ -663,7 +879,6 @@
                 salePrice = dynamicVal;
                 document.getElementById('resRequiredSalePriceBlock').classList.add('hidden');
 
-                // Определение эффективных сумм по ДКП
                 const effectiveBuyDkp = (isDkpDiff && !isNaN(buyPriceDkpInput)) ? buyPriceDkpInput : buyPrice;
                 let effectiveSellDkp = salePrice;
                 if (isDkpDiff && !isNaN(sellPriceDkpInput)) {
@@ -794,6 +1009,9 @@
 
             document.getElementById('smartSummary').innerHTML = summaryHtml;
             document.getElementById('results').classList.remove('hidden');
+
+            // Заполняем сводную таблицу сценариев
+            renderScenarioTable(salePrice);
         }
 
         function exportCalculationToPDF() {
@@ -808,12 +1026,17 @@
             btn.disabled = true;
             btnText.textContent = "Формируем PDF...";
 
+            // Сохраняем текущую прокрутку и временно центрируем окно
+            const prevScrollX = window.pageXOffset || document.documentElement.scrollLeft || 0;
+            const prevScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+            window.scrollTo(0, 0);
+
             const variantTitle = document.getElementById('pdfVariantTitle').value.trim() || "Инвестиционный расчет объекта";
             const now = new Date();
             const dateStr = now.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
             const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             
-            const modeText = currentMode === 1 ? "Расчет фактической доходности" : "Расчет требуемой цены продажи";
+            const modeText = currentMode === 1 ? "Расчет доходности" : "Расчет требуемой цены";
             const finModelText = currentFinModel === 'investor' ? "Частный инвестор" : "Ипотека / кредит банка";
             
             const buyPrice = formatMoney(parseFloat(document.getElementById('buyPrice').value) || 0) + " ₽";
@@ -834,18 +1057,21 @@
             const card4Val = document.getElementById('resCard4').textContent;
             const taxVal = document.getElementById('resTax').textContent;
 
+            // HTML сводной таблицы для PDF
+            const tableRows = document.getElementById('scenarioTableBody').innerHTML;
+
             let finDetailsHtml = "";
             if (currentFinModel === 'investor') {
                 const invAmt = formatMoney(parseFloat(document.getElementById('investorAmount').value) || 0) + " ₽";
                 const invShare = (document.getElementById('investorsShare').value || 0) + "%";
                 const mult = (document.getElementById('profitMultiplier').value || 60) + "%";
                 finDetailsHtml = `
-                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #334155; text-transform: uppercase;">Параметры инвестора</h4>
-                        <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-                            <tr><td style="padding: 4px 0; color: #64748b;">Сумма займа:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${invAmt}</td></tr>
-                            <tr><td style="padding: 4px 0; color: #64748b;">Базовые условия:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${mult}</td></tr>
-                            <tr><td style="padding: 4px 0; color: #64748b;">Итоговая доля прибыли инвестора:</td><td style="text-align: right; font-weight: bold; color: #4338ca;">${invShare}</td></tr>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+                        <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Параметры инвестора</h4>
+                        <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                            <tr><td style="padding: 2px 0; color: #64748b;">Сумма займа:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${invAmt}</td></tr>
+                            <tr><td style="padding: 2px 0; color: #64748b;">Базовые условия:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${mult}</td></tr>
+                            <tr><td style="padding: 2px 0; color: #64748b;">Итоговая доля прибыли инвестора:</td><td style="text-align: right; font-weight: bold; color: #4338ca;">${invShare}</td></tr>
                         </table>
                     </div>
                 `;
@@ -856,77 +1082,98 @@
                 const monthly = document.getElementById('resMonthlyPayment').textContent;
                 const bankInt = document.getElementById('resBankInterest').textContent;
                 finDetailsHtml = `
-                    <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #334155; text-transform: uppercase;">Параметры кредита / ипотеки</h4>
-                        <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-                            <tr><td style="padding: 4px 0; color: #64748b;">Сумма кредита:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${formatMoney(loanAmount)} ₽</td></tr>
-                            <tr><td style="padding: 4px 0; color: #64748b;">Первоначальный взнос (ПВ):</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${formatMoney(downPayment)} ₽</td></tr>
-                            <tr><td style="padding: 4px 0; color: #64748b;">Ставка и срок:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${rate} | ${years}</td></tr>
-                            <tr><td style="padding: 4px 0; color: #64748b;">Ежемесячный платеж:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${monthly}</td></tr>
-                            <tr><td style="padding: 4px 0; color: #64748b;">Проценты банку за срок сделки:</td><td style="text-align: right; font-weight: bold; color: #e11d48;">${bankInt}</td></tr>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+                        <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Параметры кредита / ипотеки</h4>
+                        <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                            <tr><td style="padding: 2px 0; color: #64748b;">Сумма кредита:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${formatMoney(loanAmount)} ₽</td></tr>
+                            <tr><td style="padding: 2px 0; color: #64748b;">Первоначальный взнос (ПВ):</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${formatMoney(downPayment)} ₽</td></tr>
+                            <tr><td style="padding: 2px 0; color: #64748b;">Ставка и срок:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${rate} | ${years}</td></tr>
+                            <tr><td style="padding: 2px 0; color: #64748b;">Ежемесячный платеж:</td><td style="text-align: right; font-weight: bold; color: #0f172a;">${monthly}</td></tr>
+                            <tr><td style="padding: 2px 0; color: #64748b;">Проценты банку за срок сделки:</td><td style="text-align: right; font-weight: bold; color: #e11d48;">${bankInt}</td></tr>
                         </table>
                     </div>
                 `;
             }
 
             const pdfHtml = `
-                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 30px; color: #0f172a; background: #ffffff; width: 750px; box-sizing: border-box;">
-                    <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 18px 22px; color: #0f172a; background: #ffffff; width: 720px; box-sizing: border-box; margin: 0 auto;">
+                    <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end;">
                         <div>
-                            <span style="font-size: 11px; font-weight: 700; color: #4f46e5; text-transform: uppercase; letter-spacing: 1px;">Инвестиционный меморандум</span>
-                            <h2 style="margin: 4px 0 0 0; font-size: 22px; color: #0f172a; font-weight: 800;">${variantTitle}</h2>
-                            <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Модель: <strong>${finModelText}</strong> | Режим: ${modeText}</p>
+                            <span style="font-size: 10px; font-weight: 700; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.8px;">Инвестиционный отчет флиппинг-проекта</span>
+                            <h2 style="margin: 2px 0 0 0; font-size: 19px; color: #0f172a; font-weight: 800;">${variantTitle}</h2>
+                            <p style="margin: 2px 0 0 0; font-size: 11.5px; color: #64748b;">Модель: <strong>${finModelText}</strong> | Режим: ${modeText}</p>
                         </div>
-                        <div style="text-align: right; font-size: 12px; color: #64748b;">
+                        <div style="text-align: right; font-size: 11px; color: #64748b;">
                             <p style="margin: 0;">Дата: <strong>${dateStr}</strong></p>
-                            <p style="margin: 3px 0 0 0;">Время: ${timeStr}</p>
+                            <p style="margin: 2px 0 0 0;">Время: ${timeStr}</p>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #334155; text-transform: uppercase;">Фактический объект (Cash Flow)</h4>
-                            <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-                                <tr><td style="padding: 4px 0; color: #64748b;">Фактическая покупка:</td><td style="text-align: right; font-weight: bold;">${buyPrice}</td></tr>
-                                <tr><td style="padding: 4px 0; color: #64748b;">План. ремонт:</td><td style="text-align: right; font-weight: bold;">${planRen}</td></tr>
-                                <tr><td style="padding: 4px 0; color: #64748b;">Факт. ремонт:</td><td style="text-align: right; font-weight: bold;">${ren}</td></tr>
-                                <tr><td style="padding: 4px 0; color: #64748b;">Срок сделки:</td><td style="text-align: right; font-weight: bold;">${days}</td></tr>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <div style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Фактический объект (Cash Flow)</h4>
+                            <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                                <tr><td style="padding: 2px 0; color: #64748b;">Покупка:</td><td style="text-align: right; font-weight: bold;">${buyPrice}</td></tr>
+                                <tr><td style="padding: 2px 0; color: #64748b;">План. ремонт:</td><td style="text-align: right; font-weight: bold;">${planRen}</td></tr>
+                                <tr><td style="padding: 2px 0; color: #64748b;">Факт. ремонт:</td><td style="text-align: right; font-weight: bold;">${ren}</td></tr>
+                                <tr><td style="padding: 2px 0; color: #64748b;">Срок сделки:</td><td style="text-align: right; font-weight: bold;">${days}</td></tr>
                             </table>
                         </div>
 
-                        <div style="background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                            <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #334155; text-transform: uppercase;">Налогообложение</h4>
-                            <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-                                <tr><td style="padding: 4px 0; color: #64748b;">Режим расчета:</td><td style="text-align: right; font-weight: bold;">${taxDesc}</td></tr>
-                                <tr><td style="padding: 4px 0; color: #64748b;">Сумма налога:</td><td style="text-align: right; font-weight: bold; color: #b91c1c;">${taxVal}</td></tr>
+                        <div style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Налогообложение</h4>
+                            <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
+                                <tr><td style="padding: 2px 0; color: #64748b;">Режим расчета:</td><td style="text-align: right; font-weight: bold;">${taxDesc}</td></tr>
+                                <tr><td style="padding: 2px 0; color: #64748b;">Сумма налога:</td><td style="text-align: right; font-weight: bold; color: #b91c1c;">${taxVal}</td></tr>
                             </table>
                         </div>
                     </div>
 
                     ${finDetailsHtml}
 
-                    <h3 style="font-size: 15px; margin: 20px 0 10px 0; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px;">Финансовые результаты</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                        <div style="background: #f1f5f9; padding: 14px; border-radius: 8px; border-left: 4px solid #475569;">
-                            <span style="font-size: 12px; color: #64748b; display: block; margin-bottom: 4px;">${card1Label}</span>
-                            <span style="font-size: 20px; font-weight: 800; color: #0f172a;">${card1Val}</span>
+                    <h3 style="font-size: 12px; margin: 10px 0 6px 0; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Базовые финансовые результаты</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                        <div style="background: #f1f5f9; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #475569;">
+                            <span style="font-size: 10.5px; color: #64748b; display: block; margin-bottom: 2px;">${card1Label}</span>
+                            <span style="font-size: 16px; font-weight: 800; color: #0f172a;">${card1Val}</span>
                         </div>
-                        <div style="background: #f1f5f9; padding: 14px; border-radius: 8px; border-left: 4px solid #475569;">
-                            <span style="font-size: 12px; color: #64748b; display: block; margin-bottom: 4px;">${card2Label}</span>
-                            <span style="font-size: 20px; font-weight: 800; color: #0f172a;">${card2Val}</span>
+                        <div style="background: #f1f5f9; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #475569;">
+                            <span style="font-size: 10.5px; color: #64748b; display: block; margin-bottom: 2px;">${card2Label}</span>
+                            <span style="font-size: 16px; font-weight: 800; color: #0f172a;">${card2Val}</span>
                         </div>
-                        <div style="background: #eef2ff; padding: 14px; border-radius: 8px; border-left: 4px solid #4f46e5;">
-                            <span style="font-size: 12px; color: #4338ca; display: block; margin-bottom: 4px; font-weight: 600;">${card3Label}</span>
-                            <span style="font-size: 20px; font-weight: 800; color: #3730a3;">${card3Val}</span>
+                        <div style="background: #eef2ff; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #4f46e5;">
+                            <span style="font-size: 10.5px; color: #4338ca; display: block; margin-bottom: 2px; font-weight: 600;">${card3Label}</span>
+                            <span style="font-size: 16px; font-weight: 800; color: #3730a3;">${card3Val}</span>
                         </div>
-                        <div style="background: #eef2ff; padding: 14px; border-radius: 8px; border-left: 4px solid #4f46e5;">
-                            <span style="font-size: 12px; color: #4338ca; display: block; margin-bottom: 4px; font-weight: 600;">${card4Label}</span>
-                            <span style="font-size: 20px; font-weight: 800; color: #3730a3;">${card4Val}</span>
+                        <div style="background: #eef2ff; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #4f46e5;">
+                            <span style="font-size: 10.5px; color: #4338ca; display: block; margin-bottom: 2px; font-weight: 600;">${card4Label}</span>
+                            <span style="font-size: 16px; font-weight: 800; color: #3730a3;">${card4Val}</span>
                         </div>
                     </div>
 
-                    <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8;">
-                        <span>Калькулятор доходности проекта</span>
+                    <!-- Сводная таблица сценариев в PDF -->
+                    <h3 style="font-size: 12px; margin: 10px 0 6px 0; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Сводная таблица сценариев реализации</h3>
+                    <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 12px;">
+                        <table style="width: 100%; font-size: 10.5px; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="background: #f1f5f9; color: #334155; border-bottom: 1px solid #cbd5e1;">
+                                    <th style="padding: 5px 7px;">Сценарий</th>
+                                    <th style="padding: 5px 7px;">Цена продажи</th>
+                                    <th style="padding: 5px 7px;">Прибыль проекта</th>
+                                    <th style="padding: 5px 7px;">Доходность</th>
+                                    <th style="padding: 5px 7px;">Доход инвестора</th>
+                                    <th style="padding: 5px 7px;">% инвестора</th>
+                                    <th style="padding: 5px 7px;">Прибыль флиппера</th>
+                                </tr>
+                            </thead>
+                            <tbody style="line-height: 1.35;">
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="border-top: 1px solid #e2e8f0; padding-top: 6px; display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                        <span>Калькулятор инвестиционной доходности</span>
                         <span>Документ сформирован автоматически</span>
                     </div>
                 </div>
@@ -937,24 +1184,27 @@
             container.style.position = 'fixed';
             container.style.left = '0';
             container.style.top = '0';
+            container.style.width = '100%';
             container.style.zIndex = '-9999';
             container.style.opacity = '1';
             container.classList.remove('hidden');
 
             const safeFileName = variantTitle.replace(/[^a-zA-Z0-9а-яА-ЯёЁ_-]/g, '_').substring(0, 40);
             const opt = {
-                margin: 0,
+                margin: [6, 6, 6, 6],
                 filename: `${safeFileName}_${dateStr.replace(/\./g, '-')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { 
                     scale: 2, 
                     useCORS: true, 
                     logging: false,
-                    scrollY: 0,
                     scrollX: 0,
-                    windowWidth: 800
+                    scrollY: 0,
+                    x: 0,
+                    y: 0,
+                    windowWidth: 1024
                 },
-                jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
             setTimeout(() => {
@@ -962,14 +1212,17 @@
                     html2pdf().set(opt).from(container.firstElementChild).save().then(() => {
                         container.classList.add('hidden');
                         container.innerHTML = "";
+                        window.scrollTo(prevScrollX, prevScrollY);
                         btn.disabled = false;
                         btnText.textContent = "✓ PDF сохранен!";
                         setTimeout(() => { btnText.textContent = originalText; }, 2500);
                     }).catch(err => {
                         console.error("PDF export error:", err);
+                        window.scrollTo(prevScrollX, prevScrollY);
                         fallbackPrint(container, btn, btnText, originalText);
                     });
                 } else {
+                    window.scrollTo(prevScrollX, prevScrollY);
                     fallbackPrint(container, btn, btnText, originalText);
                 }
             }, 250);
@@ -982,8 +1235,11 @@
             container.classList.add('hidden');
         }
 
-        // Инициализация
-        updateModeLabels();
+        // Автоматический старт при загрузке
+        window.addEventListener('DOMContentLoaded', () => {
+            updateModeLabels();
+            calculateROI(false);
+        });
     </script>
 </body>
 </html>
