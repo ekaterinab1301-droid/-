@@ -20,6 +20,7 @@
             body { background: white !important; padding: 0 !important; }
             #copyLinkBtn, button { display: none !important; }
         }
+        html, body { overflow-x: hidden; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen p-3 md:p-8 font-sans relative text-slate-800">
@@ -85,14 +86,14 @@
                             <input type="number" id="buyPrice" value="" placeholder="Например 10000000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Плановые расходы на ремонт</label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Плановые расходы</label>
                             <input type="number" id="planRenovation" value="" placeholder="Например 1500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
                             <p class="text-[11px] text-slate-400 mt-1">Используется для расчета справедливой доли инвестора</p>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Фактические расходы на ремонт</label>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Фактические расходы</label>
                             <input type="number" id="renovation" value="" placeholder="Например 1500000" oninput="autoRecalculate()" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800 transition-all">
-                            <p class="text-[11px] text-slate-400 mt-1">Реальные затраты на стройку, материалы и комплектацию</p>
+                            <p class="text-[11px] text-slate-400 mt-1">Все реальные затраты по сделке, кроме отдельно учтенного финансирования</p>
                         </div>
                         <div class="md:col-span-2">
                             <div class="flex justify-between items-center mb-1.5">
@@ -277,13 +278,13 @@
             <!-- БЛОК РЕЗУЛЬТАТОВ -->
             <div id="results" class="hidden mt-6 space-y-6">
                 
-                <div id="resRequiredSalePriceBlock" class="hidden bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center">
+                <div id="resRequiredSalePriceBlock" class="financial-output hidden bg-blue-50 border border-blue-200 rounded-2xl p-6 text-center transition-opacity">
                     <p class="text-blue-800 font-semibold mb-1 text-sm uppercase tracking-wider">Требуемая фактическая цена продажи</p>
                     <p id="resRequiredSalePrice" class="text-3xl md:text-4xl font-extrabold text-blue-700"></p>
                 </div>
 
                 <!-- Карточки результатов -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="financial-output grid grid-cols-1 md:grid-cols-2 gap-4 transition-opacity">
                     <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
                         <p id="lblCard1" class="text-slate-500 text-xs uppercase font-bold tracking-wider mb-1">Прибыль проекта (Тотал)</p>
                         <p id="resCard1" class="text-2xl font-black text-slate-800"></p>
@@ -297,6 +298,7 @@
                     <div class="bg-indigo-50/80 p-5 rounded-2xl border border-indigo-100">
                         <p id="lblCard3" class="text-indigo-600 text-xs uppercase font-bold tracking-wider mb-1">Прибыль инвестора</p>
                         <p id="resCard3" class="text-2xl font-black text-indigo-700"></p>
+                        <p id="resCard3Secondary" class="hidden text-xs font-semibold text-indigo-500 mt-1"></p>
                     </div>
 
                     <div class="bg-indigo-50/80 p-5 rounded-2xl border border-indigo-100">
@@ -306,7 +308,7 @@
                 </div>
 
                 <!-- Детали ипотеки -->
-                <div id="mortgageDetailsBar" class="hidden grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs md:text-sm">
+                <div id="mortgageDetailsBar" class="financial-output hidden grid grid-cols-1 md:grid-cols-3 gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs md:text-sm transition-opacity">
                     <div>
                         <span class="text-slate-500 block text-xs">Ежемесячный платеж банку:</span>
                         <strong id="resMonthlyPayment" class="text-slate-800 text-base"></strong>
@@ -321,7 +323,7 @@
                     </div>
                 </div>
                 
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex justify-between items-center">
+                <div class="financial-output bg-slate-50 p-4 rounded-2xl border border-slate-200 flex justify-between items-center transition-opacity">
                     <div>
                         <span class="text-slate-500 text-xs uppercase font-bold tracking-wider block">Налог</span>
                         <span id="resTaxModeDesc" class="text-xs text-slate-400">расчетный налог</span>
@@ -330,7 +332,7 @@
                 </div>
 
                 <!-- Умное резюме -->
-                <div id="smartSummary" class="mt-4"></div>
+                <div id="smartSummary" class="financial-output mt-4 transition-opacity"></div>
 
                 <!-- СВОДНАЯ ТАБЛИЦА СЦЕНАРИЕВ: 7 ШАГОВ -->
                 <div id="scenarioSection" class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
@@ -341,20 +343,43 @@
                             </h3>
                             <p class="text-xs text-slate-500 mt-0.5">Сравнение чистой прибыли и доходности при разных вариантах реализации</p>
                         </div>
-                        <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
-                            <button type="button" id="btnScenPercent" onclick="switchScenarioMode('percent')" class="px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all">±15% (шаг 5%)</button>
-                            <button type="button" id="btnScenStep" onclick="switchScenarioMode('step')" class="px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Шаг 500 000 ₽</button>
+                        <div class="flex flex-col items-stretch sm:items-end gap-1.5">
+                            <div id="investorScenarioViewSwitch" class="flex items-center gap-1.5 bg-indigo-50 p-1 rounded-xl">
+                                <button type="button" id="btnViewSingle" onclick="switchInvestorScenarioView('single')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all">Один инвестор</button>
+                                <button type="button" id="btnViewAll" onclick="switchInvestorScenarioView('all')" class="flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Все инвесторы</button>
+                            </div>
+                            <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+                                <button type="button" id="btnScen300" onclick="switchScenarioMode(300000)" class="flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all">Шаг 300 000 ₽</button>
+                                <button type="button" id="btnScen500" onclick="switchScenarioMode(500000)" class="flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all">Шаг 500 000 ₽</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto">
+                    <details id="allInvestorsPanel" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3" open>
+                        <summary class="cursor-pointer text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Состав инвесторов
+                        </summary>
+                        <div class="mt-3 space-y-3">
+                            <div id="investorPoolRows" class="space-y-2"></div>
+                            <button type="button" onclick="addInvestorPoolRow()" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+                                + Добавить инвестора
+                            </button>
+                            <div id="investorPoolSummary" class="text-[11px] text-slate-500 leading-relaxed"></div>
+                            <div id="investorPoolError" class="hidden text-xs text-rose-600 font-semibold"></div>
+                            <div id="calculationStaleWarning" class="hidden p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 font-semibold">
+                                Финансовые результаты временно неактуальны. Исправьте данные инвесторов; пересчёт выполнится автоматически.
+                            </div>
+                        </div>
+                    </details>
+
+                    <div class="financial-output overflow-x-auto transition-opacity">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
                                     <th class="py-2.5 px-3 font-semibold">Сценарий</th>
                                     <th class="py-2.5 px-3 font-semibold">Цена продажи</th>
                                     <th class="py-2.5 px-3 font-semibold">Прибыль проекта</th>
-                                    <th class="py-2.5 px-3 font-semibold">Доходность проекта</th>
+                                    <th class="py-2.5 px-3 font-semibold" id="colHeaderProjectYield">Доходность проекта</th>
                                     <th class="py-2.5 px-3 font-semibold" id="colHeaderInvProfit">Прибыль инвестора</th>
                                     <th class="py-2.5 px-3 font-semibold" id="colHeaderInvYield">Доходность инв-ра</th>
                                 </tr>
@@ -364,7 +389,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <p class="text-[11px] text-slate-400">💡 Доходность проекта и инвесторов пересчитана в % годовых с учетом фактического срока сделки.</p>
+                    <p id="scenarioHint" class="financial-output text-[11px] text-slate-400 transition-opacity">💡 Доходность проекта и инвестора пересчитана в % годовых с учетом фактического срока сделки.</p>
                 </div>
 
                 <!-- БЛОК ЭКСПОРТА В PDF -->
@@ -387,11 +412,361 @@
     <!-- КОНТЕЙНЕР ДЛЯ РЕНДЕРИНГА PDF -->
     <div id="pdfExportContainer" class="hidden"></div>
 
+    <script id="financial-core">
+        (function(root) {
+            'use strict';
+
+            const TAX_RATE = 0.15;
+            const DAYS_IN_YEAR = 365;
+            const MONTHS_IN_YEAR = 12;
+
+            function isFiniteNumber(value) {
+                return typeof value === 'number' && Number.isFinite(value);
+            }
+
+            function investorShare(params) {
+                const budget = params.buyPrice + params.plannedExpenses;
+                if (budget <= 0 || params.investorAmount <= 0) return 0;
+                return (params.investorAmount / budget) * (params.profitMultiplierPercent / 100);
+            }
+
+            function investorPool(params, distributableProfit) {
+                const budget = params.buyPrice + params.plannedExpenses;
+                const investors = Array.isArray(params.investors) ? params.investors : [];
+                const totalLoan = investors.reduce(function(sum, investor) {
+                    return sum + investor.amount;
+                }, 0);
+                const weightedProfitPercent = totalLoan > 0
+                    ? investors.reduce(function(sum, investor) {
+                        return sum + investor.amount * investor.profitPercent;
+                    }, 0) / totalLoan
+                    : 0;
+                const totalShare = budget > 0
+                    ? investors.reduce(function(sum, investor) {
+                        return sum + (investor.amount / budget) * (investor.profitPercent / 100);
+                    }, 0)
+                    : 0;
+                const investorsProfit = Math.max(0, distributableProfit) * totalShare;
+                const annualYield = totalLoan > 0
+                    && distributableProfit > 0
+                    && params.dealDays > 0
+                    ? (investorsProfit / totalLoan) * (DAYS_IN_YEAR / params.dealDays) * 100
+                    : 0;
+
+                return {
+                    totalLoan: totalLoan,
+                    weightedProfitPercent: weightedProfitPercent,
+                    totalShare: totalShare,
+                    investorsProfit: investorsProfit,
+                    annualYield: annualYield,
+                    ownerProfit: distributableProfit - investorsProfit,
+                    principalRepayment: totalLoan
+                };
+            }
+
+            function calculateAnnuity(principal, annualRatePercent, years) {
+                if (principal <= 0 || years <= 0) return 0;
+                const monthlyRate = (annualRatePercent / 100) / MONTHS_IN_YEAR;
+                const totalMonths = Math.round(years * MONTHS_IN_YEAR);
+                if (totalMonths <= 0) return 0;
+                if (monthlyRate === 0) return principal / totalMonths;
+                const factor = Math.pow(1 + monthlyRate, totalMonths);
+                return principal * (monthlyRate * factor) / (factor - 1);
+            }
+
+            function calculateMortgage(params) {
+                if (params.model !== 'mortgage') {
+                    return {
+                        monthlyPayment: 0,
+                        interestPaid: 0,
+                        principalPaid: 0,
+                        outstandingPrincipal: 0,
+                        scheduledPaymentsPaid: 0,
+                        accruedInterest: 0,
+                        ownCapital: params.buyPrice + params.actualExpenses
+                    };
+                }
+
+                const principal = params.loanAmount;
+                const monthlyRate = (params.mortgageRate / 100) / MONTHS_IN_YEAR;
+                const totalMonths = Math.max(1, Math.round(params.mortgageYears * MONTHS_IN_YEAR));
+                const monthlyPayment = calculateAnnuity(principal, params.mortgageRate, params.mortgageYears);
+                const periodDays = DAYS_IN_YEAR / MONTHS_IN_YEAR;
+                const completedPayments = Math.min(totalMonths, Math.floor(params.dealDays / periodDays));
+                let balance = principal;
+                let interestPaid = 0;
+                let scheduledPaymentsPaid = 0;
+
+                for (let month = 0; month < completedPayments && balance > 0.000001; month += 1) {
+                    const interest = balance * monthlyRate;
+                    const payment = Math.min(monthlyPayment, balance + interest);
+                    const principalPayment = Math.max(0, payment - interest);
+                    interestPaid += interest;
+                    scheduledPaymentsPaid += payment;
+                    balance = Math.max(0, balance - principalPayment);
+                }
+
+                const elapsedDays = completedPayments * periodDays;
+                const remainingFraction = balance > 0
+                    ? Math.max(0, Math.min(1, (params.dealDays - elapsedDays) / periodDays))
+                    : 0;
+                const accruedInterest = balance * monthlyRate * remainingFraction;
+                interestPaid += accruedInterest;
+
+                return {
+                    monthlyPayment: monthlyPayment,
+                    interestPaid: interestPaid,
+                    principalPaid: principal - balance,
+                    outstandingPrincipal: balance,
+                    scheduledPaymentsPaid: scheduledPaymentsPaid,
+                    accruedInterest: accruedInterest,
+                    ownCapital: params.downPayment
+                        + params.actualExpenses
+                        + params.mortgageExtraCosts
+                        + scheduledPaymentsPaid
+                        + accruedInterest
+                };
+            }
+
+            function calculateTax(params, salePrice, mortgage) {
+                if (params.tax.manual) {
+                    return {
+                        amount: params.tax.manualAmount,
+                        base: null,
+                        officialSalePrice: params.tax.dkpSellPrice == null ? salePrice : params.tax.dkpSellPrice
+                    };
+                }
+
+                const officialSalePrice = params.tax.dkpSellPrice == null
+                    ? salePrice
+                    : params.tax.dkpSellPrice;
+                const confirmedExpenses = params.tax.ownerType === 'ip'
+                    ? (params.tax.deductibleType === 'percent'
+                        ? params.actualExpenses * (params.tax.deductibleValue / 100)
+                        : params.tax.deductibleValue)
+                    : 0;
+                const financingDeductions = params.tax.ownerType === 'ip'
+                    ? mortgage.interestPaid + params.mortgageExtraCosts
+                    : mortgage.interestPaid;
+                const base = Math.max(
+                    0,
+                    officialSalePrice - params.tax.dkpBuyPrice - confirmedExpenses - financingDeductions
+                );
+
+                return { amount: base * TAX_RATE, base: base, officialSalePrice: officialSalePrice };
+            }
+
+            function calculateDeal(params, salePrice) {
+                const mortgage = calculateMortgage(params);
+                const tax = calculateTax(params, salePrice, mortgage);
+                const financingCosts = params.model === 'mortgage'
+                    ? mortgage.interestPaid + params.mortgageExtraCosts
+                    : 0;
+                const projectCost = params.buyPrice + params.actualExpenses + financingCosts;
+                const netProfit = salePrice - projectCost - tax.amount;
+                const annualFactor = DAYS_IN_YEAR / params.dealDays;
+                const projectYield = projectCost > 0 ? (netProfit / projectCost) * annualFactor * 100 : 0;
+                const share = params.model === 'investor' ? investorShare(params) : 0;
+                const distributableProfit = Math.max(0, netProfit);
+                const investorProfit = params.model === 'investor' ? distributableProfit * share : 0;
+                const investorYield = params.model === 'investor' && params.investorAmount > 0
+                    ? (investorProfit / params.investorAmount) * annualFactor * 100
+                    : 0;
+                const roe = params.model === 'mortgage' && mortgage.ownCapital > 0
+                    ? (netProfit / mortgage.ownCapital) * annualFactor * 100
+                    : 0;
+                const pool = params.model === 'investor'
+                    ? investorPool(params, netProfit)
+                    : investorPool(Object.assign({}, params, { investors: [] }), netProfit);
+
+                return {
+                    salePrice: salePrice,
+                    plannedBudget: params.buyPrice + params.plannedExpenses,
+                    expenseVariance: params.plannedExpenses - params.actualExpenses,
+                    investorShare: share,
+                    tax: tax.amount,
+                    taxBase: tax.base,
+                    officialSalePrice: tax.officialSalePrice,
+                    netProfit: netProfit,
+                    projectYield: projectYield,
+                    investorPrincipalRepayment: params.model === 'investor' ? params.investorAmount : 0,
+                    investorProfit: investorProfit,
+                    investorYield: investorYield,
+                    investorPool: pool,
+                    flipperProfit: params.model === 'investor' ? netProfit - investorProfit : netProfit,
+                    roe: roe,
+                    projectCost: projectCost,
+                    mortgage: mortgage
+                };
+            }
+
+            function validate(params, options) {
+                const errors = [];
+                const requiredNonNegative = [
+                    ['Цена покупки', params.buyPrice],
+                    ['Плановые расходы', params.plannedExpenses],
+                    ['Фактические расходы', params.actualExpenses]
+                ];
+                requiredNonNegative.forEach(function(item) {
+                    if (!isFiniteNumber(item[1]) || item[1] < 0) errors.push(item[0] + ': укажите неотрицательное число.');
+                });
+                if (!isFiniteNumber(params.buyPrice) || params.buyPrice <= 0) errors.push('Цена покупки должна быть больше нуля.');
+                if (!isFiniteNumber(params.dealDays) || params.dealDays <= 0) errors.push('Срок сделки должен быть больше нуля.');
+                if (params.buyPrice + params.plannedExpenses <= 0) errors.push('Плановый бюджет должен быть больше нуля.');
+
+                if (params.model === 'investor') {
+                    const requireSingleInvestor = params.investorAnalysisMode !== 'all'
+                        || (options && options.requireSingleInvestor);
+                    if (requireSingleInvestor) {
+                        if (!isFiniteNumber(params.investorAmount) || params.investorAmount <= 0) {
+                            errors.push('Сумма займа инвестора должна быть больше нуля.');
+                        } else if (params.investorAmount > params.buyPrice + params.plannedExpenses) {
+                            errors.push('Сумма займа не может превышать плановый бюджет проекта.');
+                        }
+                        if (!isFiniteNumber(params.profitMultiplierPercent)
+                            || params.profitMultiplierPercent <= 0
+                            || params.profitMultiplierPercent > 100) {
+                            errors.push('Договорная доля инвестора должна быть от 0 до 100%.');
+                        }
+                    }
+
+                    if (params.investorAnalysisMode === 'all') {
+                        const investors = Array.isArray(params.investors) ? params.investors : [];
+                        if (!investors.length) errors.push('Добавьте хотя бы одного инвестора.');
+                        investors.forEach(function(investor, index) {
+                            if (!isFiniteNumber(investor.amount) || investor.amount <= 0) {
+                                errors.push('Инвестор ' + (index + 1) + ': сумма займа должна быть больше нуля.');
+                            }
+                            if (!isFiniteNumber(investor.profitPercent)
+                                || investor.profitPercent <= 0
+                                || investor.profitPercent > 100) {
+                                errors.push('Инвестор ' + (index + 1) + ': договорной процент должен быть от 0 до 100%.');
+                            }
+                        });
+                        const pool = investorPool(params, 0);
+                        if (pool.totalLoan > params.buyPrice + params.plannedExpenses) {
+                            errors.push('Общая сумма займов не может превышать плановый бюджет проекта.');
+                        }
+                        if (pool.totalShare > 1 + 1e-12) {
+                            errors.push('Совокупная доля прибыли инвесторов не может превышать 100%.');
+                        }
+                    }
+                } else {
+                    if (!isFiniteNumber(params.loanAmount) || params.loanAmount < 0 || params.loanAmount > params.buyPrice) {
+                        errors.push('Сумма кредита должна быть от 0 до цены покупки.');
+                    }
+                    if (!isFiniteNumber(params.downPayment) || params.downPayment < 0) errors.push('Первоначальный взнос некорректен.');
+                    if (!isFiniteNumber(params.mortgageRate) || params.mortgageRate < 0) errors.push('Ставка банка некорректна.');
+                    if (!isFiniteNumber(params.mortgageYears) || params.mortgageYears <= 0) errors.push('Срок кредита должен быть больше нуля.');
+                    if (!isFiniteNumber(params.mortgageExtraCosts) || params.mortgageExtraCosts < 0) errors.push('Дополнительные расходы некорректны.');
+                }
+
+                if (params.tax.manual) {
+                    if (!isFiniteNumber(params.tax.manualAmount) || params.tax.manualAmount < 0) {
+                        errors.push('Ручной налог должен быть неотрицательным числом.');
+                    }
+                } else {
+                    if (!isFiniteNumber(params.tax.dkpBuyPrice) || params.tax.dkpBuyPrice < 0) errors.push('Цена покупки по ДКП некорректна.');
+                    if (params.tax.dkpSellPrice != null
+                        && (!isFiniteNumber(params.tax.dkpSellPrice) || params.tax.dkpSellPrice < 0)) {
+                        errors.push('Цена продажи по ДКП некорректна.');
+                    }
+                    if (!isFiniteNumber(params.tax.deductibleValue) || params.tax.deductibleValue < 0) {
+                        errors.push('Подтвержденные расходы некорректны.');
+                    }
+                    if (params.tax.deductibleType === 'percent' && params.tax.deductibleValue > 100) {
+                        errors.push('Процент подтвержденных расходов не может превышать 100%.');
+                    }
+                }
+
+                if (options && options.salePrice != null
+                    && (!isFiniteNumber(options.salePrice) || options.salePrice <= 0)) {
+                    errors.push('Цена продажи должна быть больше нуля.');
+                }
+                if (options && options.targetYield != null
+                    && (!isFiniteNumber(options.targetYield) || options.targetYield < 0)) {
+                    errors.push('Желаемая доходность должна быть неотрицательным числом.');
+                }
+                return Array.from(new Set(errors));
+            }
+
+            function solveSalePrice(params, targetYield) {
+                const errors = validate(params, { targetYield: targetYield, requireSingleInvestor: true });
+                if (errors.length) return { ok: false, errors: errors };
+
+                const metric = function(deal) {
+                    if (params.model === 'investor' && targetYield === 0) return deal.netProfit;
+                    return params.model === 'investor' ? deal.investorYield : deal.roe;
+                };
+                const targetMetric = params.model === 'investor' && targetYield === 0 ? 0 : targetYield;
+                let low = 0;
+                let high = Math.max(
+                    1000000,
+                    (params.buyPrice + params.actualExpenses + params.mortgageExtraCosts + params.tax.manualAmount) * 1.5
+                );
+                let highDeal = calculateDeal(params, high);
+                let attempts = 0;
+
+                while ((!Number.isFinite(metric(highDeal)) || metric(highDeal) < targetMetric)
+                    && high < 1e15
+                    && attempts < 80) {
+                    high *= 2;
+                    highDeal = calculateDeal(params, high);
+                    attempts += 1;
+                }
+
+                if (!Number.isFinite(metric(highDeal)) || metric(highDeal) < targetMetric) {
+                    return { ok: false, errors: ['Для заданной доходности не найдено математическое решение.'] };
+                }
+
+                for (let iteration = 0; iteration < 120; iteration += 1) {
+                    const middle = (low + high) / 2;
+                    const middleDeal = calculateDeal(params, middle);
+                    if (metric(middleDeal) < targetMetric) low = middle;
+                    else high = middle;
+                }
+
+                return { ok: true, salePrice: high, deal: calculateDeal(params, high) };
+            }
+
+            function buildScenarios(basePrice, step) {
+                return [-3, -2, -1, 0, 1, 2, 3].map(function(offset) {
+                    return {
+                        name: offset === 0
+                            ? 'Базовая цена'
+                            : (offset < 0 ? 'Снижение' : 'Повышение') + ' ' + Math.abs(offset) + ' '
+                                + (Math.abs(offset) === 1 ? 'шаг' : 'шага'),
+                        price: basePrice + offset * step,
+                        isBase: offset === 0,
+                        isValid: basePrice + offset * step > 0
+                    };
+                });
+            }
+
+            root.CalculatorCore = {
+                TAX_RATE: TAX_RATE,
+                calculateAnnuity: calculateAnnuity,
+                calculateMortgage: calculateMortgage,
+                calculateTax: calculateTax,
+                calculateDeal: calculateDeal,
+                investorShare: investorShare,
+                investorPool: investorPool,
+                validate: validate,
+                solveSalePrice: solveSalePrice,
+                buildScenarios: buildScenarios
+            };
+        })(typeof window !== 'undefined' ? window : globalThis);
+    </script>
+
     <script>
         let currentMode = 1; // 1: Узнать доходность, 2: Узнать цену продажи
         let currentFinModel = 'investor'; // 'investor' или 'mortgage'
-        let currentScenarioMode = 'percent'; // 'percent' или 'step'
+        let currentScenarioStep = 300000;
+        let currentInvestorScenarioView = 'single';
+        let investorPoolInitialized = false;
         let isCalculated = false;
+        let hasCompletedCalculation = false;
+        let lastCalculation = null;
 
         function copyCalculatorLink() {
             const dummy = document.createElement('input');
@@ -459,31 +834,170 @@
                 btnMort.className = "py-2.5 px-3 md:px-4 text-xs md:text-sm font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-2";
                 secInv.classList.remove('hidden');
                 secMort.classList.add('hidden');
+                document.getElementById('investorScenarioViewSwitch').classList.remove('hidden');
+                document.getElementById('allInvestorsPanel').classList.toggle('hidden', currentInvestorScenarioView !== 'all');
             } else {
                 btnMort.className = "py-2.5 px-3 md:px-4 text-xs md:text-sm font-semibold rounded-lg shadow-sm bg-white text-indigo-600 transition-all flex items-center justify-center gap-2";
                 btnInv.className = "py-2.5 px-3 md:px-4 text-xs md:text-sm font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-2";
                 secMort.classList.remove('hidden');
                 secInv.classList.add('hidden');
+                document.getElementById('investorScenarioViewSwitch').classList.add('hidden');
+                document.getElementById('allInvestorsPanel').classList.add('hidden');
             }
 
             updateModeLabels();
             autoRecalculate();
         }
 
-        function switchScenarioMode(mode) {
-            currentScenarioMode = mode;
-            const btnP = document.getElementById('btnScenPercent');
-            const btnS = document.getElementById('btnScenStep');
-            if (mode === 'percent') {
-                btnP.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all";
-                btnS.className = "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+        function switchScenarioMode(step) {
+            currentScenarioStep = step;
+            const btn300 = document.getElementById('btnScen300');
+            const btn500 = document.getElementById('btnScen500');
+            btn300.className = step === 300000
+                ? "px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all"
+                : "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+            btn500.className = step === 500000
+                ? "px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all"
+                : "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+            if (isCalculated && lastCalculation) renderScenarioTable(lastCalculation.salePrice, lastCalculation.deal);
+        }
+
+        function getInvestorPoolRows() {
+            return Array.from(document.querySelectorAll('.investor-pool-row')).map(function(row) {
+                return {
+                    amount: parseFloat(row.querySelector('.investor-pool-amount').value),
+                    profitPercent: parseFloat(row.querySelector('.investor-pool-percent').value)
+                };
+            });
+        }
+
+        function updateInvestorPoolSummary() {
+            const summary = document.getElementById('investorPoolSummary');
+            if (!summary) return;
+            const buyPrice = readNumber('buyPrice', 0);
+            const plannedExpenses = readNumber('planRenovation', 0);
+            const pool = CalculatorCore.investorPool({
+                buyPrice: buyPrice,
+                plannedExpenses: plannedExpenses,
+                investors: getInvestorPoolRows().filter(function(investor) {
+                    return Number.isFinite(investor.amount) && Number.isFinite(investor.profitPercent);
+                })
+            }, 0);
+            summary.textContent = 'Займы: ' + formatMoney(pool.totalLoan) + ' ₽'
+                + ' · Средневзвешенные условия: ' + pool.weightedProfitPercent.toFixed(2) + '%'
+                + ' · Совокупная доля прибыли: ' + (pool.totalShare * 100).toFixed(2) + '%';
+        }
+
+        function investorPoolChanged() {
+            updateInvestorPoolSummary();
+            if (hasCompletedCalculation) calculateROI(false);
+        }
+
+        function handleInvestorPoolKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.stopPropagation();
+                investorPoolChanged();
+            }
+        }
+
+        function setFinancialResultsValidity(isValid) {
+            document.querySelectorAll('.financial-output').forEach(function(element) {
+                element.classList.toggle('opacity-40', !isValid);
+                element.setAttribute('aria-invalid', isValid ? 'false' : 'true');
+            });
+            const warning = document.getElementById('calculationStaleWarning');
+            warning.classList.toggle('hidden', isValid || currentInvestorScenarioView !== 'all');
+            const pdfButton = document.getElementById('btnSavePdf');
+            pdfButton.disabled = !isValid;
+            pdfButton.classList.toggle('opacity-50', !isValid);
+            pdfButton.classList.toggle('cursor-not-allowed', !isValid);
+            pdfButton.title = isValid ? '' : 'Исправьте данные инвесторов перед экспортом PDF';
+        }
+
+        function showInvestorPoolValidationErrors(errors) {
+            const rows = Array.from(document.querySelectorAll('.investor-pool-row'));
+            rows.forEach(function(row) {
+                row.querySelector('.investor-row-error').classList.add('hidden');
+                row.querySelectorAll('input').forEach(function(input) {
+                    input.classList.remove('border-rose-400', 'ring-1', 'ring-rose-200');
+                });
+            });
+
+            const aggregateErrors = [];
+            errors.forEach(function(error) {
+                const match = error.match(/^Инвестор (\d+): (.+)$/);
+                if (!match) {
+                    aggregateErrors.push(error);
+                    return;
+                }
+                const row = rows[Number(match[1]) - 1];
+                if (!row) return;
+                const message = match[2];
+                const errorElement = row.querySelector('.investor-row-error');
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+                const input = message.includes('сумма займа')
+                    ? row.querySelector('.investor-pool-amount')
+                    : row.querySelector('.investor-pool-percent');
+                input.classList.add('border-rose-400', 'ring-1', 'ring-rose-200');
+            });
+
+            const poolError = document.getElementById('investorPoolError');
+            if (aggregateErrors.length) {
+                poolError.textContent = aggregateErrors[0];
+                poolError.classList.remove('hidden');
             } else {
-                btnS.className = "px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all";
-                btnP.className = "px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all";
+                poolError.classList.add('hidden');
             }
-            if (isCalculated) {
-                renderScenarioTable();
+        }
+
+        function addInvestorPoolRow(amount, profitPercent, importedFromSingle) {
+            const rows = document.getElementById('investorPoolRows');
+            const row = document.createElement('div');
+            row.className = 'investor-pool-row grid grid-cols-[minmax(0,1fr)_minmax(0,0.7fr)_auto] gap-2 items-end';
+            const amountValue = Number.isFinite(amount) ? amount : '';
+            const percentValue = Number.isFinite(profitPercent) ? profitPercent : 60;
+            row.innerHTML =
+                '<div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Сумма займа</label>'
+                + '<input type="number" min="0" class="investor-pool-amount w-full p-2 bg-white border border-slate-300 rounded-lg text-sm" value="' + amountValue + '" placeholder="Например 4000000" oninput="investorPoolChanged()" onkeydown="handleInvestorPoolKeydown(event)"></div>'
+                + '<div><label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Условия, %</label>'
+                + '<input type="number" min="0" max="100" step="0.01" class="investor-pool-percent w-full p-2 bg-white border border-slate-300 rounded-lg text-sm" value="' + percentValue + '" oninput="investorPoolChanged()" onkeydown="handleInvestorPoolKeydown(event)"></div>'
+                + '<button type="button" aria-label="Удалить инвестора" class="p-2 text-rose-500 hover:text-rose-700 text-lg leading-none" onclick="removeInvestorPoolRow(this)">×</button>'
+                + '<p class="investor-row-error hidden col-span-3 text-[10px] text-rose-600 font-semibold"></p>'
+                + (importedFromSingle
+                    ? '<p class="col-span-3 text-[10px] text-indigo-500">↳ Займ перенесён из режима «Один инвестор» и уже учтён в списке.</p>'
+                    : '');
+            rows.appendChild(row);
+            investorPoolChanged();
+        }
+
+        function removeInvestorPoolRow(button) {
+            button.closest('.investor-pool-row').remove();
+            investorPoolChanged();
+        }
+
+        function switchInvestorScenarioView(view) {
+            if (currentFinModel !== 'investor') return;
+            currentInvestorScenarioView = view;
+            const btnSingle = document.getElementById('btnViewSingle');
+            const btnAll = document.getElementById('btnViewAll');
+            btnSingle.className = view === 'single'
+                ? 'flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all'
+                : 'flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all';
+            btnAll.className = view === 'all'
+                ? 'flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded-lg bg-white shadow-sm text-indigo-600 transition-all'
+                : 'flex-1 sm:flex-none px-3 py-1 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-900 transition-all';
+            document.getElementById('allInvestorsPanel').classList.toggle('hidden', view !== 'all');
+
+            if (view === 'all' && !investorPoolInitialized) {
+                const amount = readNumber('investorAmount', NaN);
+                const percent = readNumber('profitMultiplier', 60);
+                addInvestorPoolRow(amount, percent, true);
+                investorPoolInitialized = true;
             }
+            updateInvestorPoolSummary();
+            if (hasCompletedCalculation) calculateROI(false);
         }
 
         function switchMode(mode) {
@@ -572,12 +1086,15 @@
             
             const budget = buyPr + planRen;
             let finalShare = "";
+            let exactShare = 0;
             
             if (budget > 0 && invAmt > 0) {
-                let shareCalc = (invAmt / budget) * mult;
-                finalShare = parseFloat(shareCalc.toFixed(2));
+                exactShare = (invAmt / budget) * (mult / 100);
+                finalShare = (exactShare * 100).toFixed(2);
             }
-            document.getElementById('investorsShare').value = finalShare;
+            const shareField = document.getElementById('investorsShare');
+            shareField.value = finalShare;
+            shareField.dataset.exactShare = exactShare;
         }
 
         function updateMortgagePreview() {
@@ -615,402 +1132,308 @@
         function autoRecalculate() {
             updateInvestorShare();
             updateMortgagePreview();
-            if (isCalculated) {
+            if (hasCompletedCalculation) {
                 calculateROI(false);
             }
         }
 
-        function calculateAnnuity(principal, annualRatePercent, years) {
-            if (principal <= 0 || years <= 0) return 0;
-            const monthlyRate = (annualRatePercent / 100) / 12;
-            const totalMonths = years * 12;
-
-            if (monthlyRate === 0) return principal / totalMonths;
-
-            const factor = Math.pow(1 + monthlyRate, totalMonths);
-            return principal * (monthlyRate * factor) / (factor - 1);
+        function readNumber(id, fallback) {
+            const value = parseFloat(document.getElementById(id).value);
+            return Number.isFinite(value) ? value : fallback;
         }
 
-        function calculateTaxBase(dkpSell, dkpBuy, ren, isIp, deductibleValue, deductibleType, interestBank, extraCosts) {
-            let deductible = 0;
-            if (isIp) {
-                let renDeduction = deductibleType === 'percent' ? (ren * (deductibleValue / 100)) : deductibleValue;
-                deductible = renDeduction + (interestBank || 0) + (extraCosts || 0);
-                return Math.max(0, dkpSell - dkpBuy - deductible);
-            } else {
-                deductible = (interestBank || 0);
-                return Math.max(0, dkpSell - dkpBuy - deductible);
-            }
-        }
-
-        // Функция единичного расчета под произвольную цену продажи (для сводной таблицы)
-        function computeScenarioMetrics(candidateSellPrice) {
-            const buyPrice = parseFloat(document.getElementById('buyPrice').value) || 0;
-            const renovation = parseFloat(document.getElementById('renovation').value) || 0;
-            const dealDays = Math.max(1, parseFloat(document.getElementById('dealDays').value) || 1);
-            
-            const isManualTax = document.getElementById('manualTaxToggle').checked;
-            const manualTaxVal = parseFloat(document.getElementById('manualTaxInput').value) || 0;
-
+        function getCalculationInput() {
+            const buyPrice = readNumber('buyPrice', NaN);
             const isDkpDiff = document.getElementById('dkpDiffToggle').checked;
-            const buyPriceDkpInput = parseFloat(document.getElementById('buyPriceDkp').value);
-            const sellPriceDkpInput = parseFloat(document.getElementById('sellPriceDkp').value);
-            const rawDkpPrice = document.getElementById('dkpPrice').value;
-            const isIp = document.querySelector('input[name="ownerType"]:checked').value === 'ip';
-
-            const deductibleType = document.getElementById('deductibleType').value;
-            const deductibleValue = parseFloat(document.getElementById('taxDeductibleValue').value) || 0;
-
-            const { downPayment, loanAmount } = updateMortgagePreview();
-
-            let bankInterest = 0;
-            let ownCapital = 0;
-            let mortgageExtraCosts = 0;
-
-            if (currentFinModel === 'mortgage') {
-                const mortgageRate = parseFloat(document.getElementById('mortgageRate').value) || 0;
-                const mortgageYears = parseFloat(document.getElementById('mortgageYears').value) || 25;
-                mortgageExtraCosts = parseFloat(document.getElementById('mortgageExtraCosts').value) || 0;
-
-                const monthlyPayment = calculateAnnuity(loanAmount, mortgageRate, mortgageYears);
-                bankInterest = loanAmount * (mortgageRate / 100) * (dealDays / 365);
-                const monthsInDeal = Math.max(1, Math.ceil(dealDays / 30.4167));
-                ownCapital = downPayment + renovation + mortgageExtraCosts + (monthlyPayment * monthsInDeal);
-            } else {
-                ownCapital = buyPrice + renovation;
+            const rawBuyDkp = readNumber('buyPriceDkp', NaN);
+            const rawSellDkp = readNumber('sellPriceDkp', NaN);
+            const rawOfficialSale = document.getElementById('dkpPrice').value.trim();
+            let fixedDkpSellPrice = null;
+            if (isDkpDiff && Number.isFinite(rawSellDkp)) {
+                fixedDkpSellPrice = rawSellDkp;
+            } else if (rawOfficialSale !== '' && Number.isFinite(parseFloat(rawOfficialSale))) {
+                fixedDkpSellPrice = parseFloat(rawOfficialSale);
             }
 
-            // Налог
-            let tax = 0;
-            if (isManualTax) {
-                tax = manualTaxVal;
-            } else {
-                const effectiveBuyDkp = (isDkpDiff && !isNaN(buyPriceDkpInput)) ? buyPriceDkpInput : buyPrice;
-                let effectiveSellDkp = candidateSellPrice;
-                if (isDkpDiff && !isNaN(sellPriceDkpInput)) {
-                    const baseInput = parseFloat(document.getElementById('dynamicInput').value) || candidateSellPrice;
-                    const ratio = baseInput > 0 ? (candidateSellPrice / baseInput) : 1;
-                    effectiveSellDkp = sellPriceDkpInput * ratio;
-                } else if (rawDkpPrice.trim() !== "" && !isNaN(parseFloat(rawDkpPrice))) {
-                    effectiveSellDkp = parseFloat(rawDkpPrice);
-                }
-
-                const taxBase = calculateTaxBase(effectiveSellDkp, effectiveBuyDkp, renovation, isIp, deductibleValue, deductibleType, bankInterest, mortgageExtraCosts);
-                tax = Math.max(0, taxBase * 0.15);
-            }
-
-            let netProfitProject = 0;
-            let projectYield = 0;
-            let investorProfit = 0;
-            let investorYield = 0;
-            let flipperProfit = 0;
-
-            if (currentFinModel === 'investor') {
-                const investorAmount = parseFloat(document.getElementById('investorAmount').value) || 0;
-                const investorsShare = parseFloat(document.getElementById('investorsShare').value) || 0;
-
-                netProfitProject = candidateSellPrice - buyPrice - renovation - tax;
-                projectYield = ownCapital > 0 ? (netProfitProject / ownCapital) * (365 / dealDays) * 100 : 0;
-
-                investorProfit = Math.max(0, netProfitProject * (investorsShare / 100));
-                flipperProfit = netProfitProject - investorProfit;
-
-                if (investorAmount > 0) {
-                    investorYield = (investorProfit / investorAmount) * (365 / dealDays) * 100;
-                }
-            } else {
-                const totalExpenses = buyPrice + renovation + bankInterest + mortgageExtraCosts;
-                netProfitProject = candidateSellPrice - totalExpenses - tax;
-                projectYield = totalExpenses > 0 ? (netProfitProject / totalExpenses) * (365 / dealDays) * 100 : 0;
-                const roe = ownCapital > 0 ? (netProfitProject / ownCapital) * (365 / dealDays) * 100 : 0;
-                
-                flipperProfit = netProfitProject;
-                investorYield = roe;
-            }
-
+            const mortgage = updateMortgagePreview();
+            const isManualTax = document.getElementById('manualTaxToggle').checked;
             return {
-                sellPrice: candidateSellPrice,
-                netProfit: netProfitProject,
-                projectYield: projectYield,
-                investorProfit: investorProfit,
-                investorYield: investorYield,
-                flipperProfit: flipperProfit,
-                tax: tax
+                model: currentFinModel,
+                investorAnalysisMode: currentInvestorScenarioView,
+                investors: getInvestorPoolRows(),
+                buyPrice: buyPrice,
+                plannedExpenses: readNumber('planRenovation', NaN),
+                actualExpenses: readNumber('renovation', NaN),
+                dealDays: readNumber('dealDays', NaN),
+                investorAmount: readNumber('investorAmount', NaN),
+                profitMultiplierPercent: readNumber('profitMultiplier', NaN),
+                downPayment: mortgage.downPayment,
+                loanAmount: mortgage.loanAmount,
+                mortgageRate: readNumber('mortgageRate', 0),
+                mortgageYears: readNumber('mortgageYears', NaN),
+                mortgageExtraCosts: readNumber('mortgageExtraCosts', 0),
+                tax: {
+                    manual: isManualTax,
+                    manualAmount: readNumber('manualTaxInput', 0),
+                    ownerType: document.querySelector('input[name="ownerType"]:checked').value,
+                    dkpBuyPrice: isDkpDiff && Number.isFinite(rawBuyDkp) ? rawBuyDkp : buyPrice,
+                    dkpSellPrice: fixedDkpSellPrice,
+                    deductibleType: document.getElementById('deductibleType').value,
+                    deductibleValue: readNumber('taxDeductibleValue', 0)
+                }
             };
         }
 
-        function renderScenarioTable(baseSalePrice) {
-            const basePrice = baseSalePrice || (parseFloat(document.getElementById('dynamicInput').value) || 0);
-            if (basePrice <= 0) return;
+        function computeScenarioMetrics(candidateSellPrice, params) {
+            return CalculatorCore.calculateDeal(params || getCalculationInput(), candidateSellPrice);
+        }
 
-            let scenarios = [];
-            if (currentScenarioMode === 'percent') {
-                scenarios = [
-                  { name: 'Стресс-сценарий (-15%)', price: Math.round(basePrice * 0.85) },
-                  { name: 'Пессимистичный (-10%)', price: Math.round(basePrice * 0.90) },
-                  { name: 'Консервативный (-5%)', price: Math.round(basePrice * 0.95) },
-                  { name: 'Базовый расчет', price: Math.round(basePrice), isBase: true },
-                  { name: 'Оптимистичный (+5%)', price: Math.round(basePrice * 1.05) },
-                  { name: 'Максимальный (+10%)', price: Math.round(basePrice * 1.10) },
-                  { name: 'Премиальный (+15%)', price: Math.round(basePrice * 1.15) }
-                ];
-            } else {
-                scenarios = [
-                  { name: 'Снижение на 1,5 млн ₽', price: Math.round(basePrice - 1500000) },
-                  { name: 'Снижение на 1 млн ₽', price: Math.round(basePrice - 1000000) },
-                  { name: 'Снижение на 500 тыс. ₽', price: Math.round(basePrice - 500000) },
-                  { name: 'Базовый расчет', price: Math.round(basePrice), isBase: true },
-                  { name: 'Рост на 500 тыс. ₽', price: Math.round(basePrice + 500000) },
-                  { name: 'Рост на 1 млн ₽', price: Math.round(basePrice + 1000000) },
-                  { name: 'Рост на 1,5 млн ₽', price: Math.round(basePrice + 1500000) }
-                ];
-            }
-
+        function renderUnifiedScenarioTable(baseSalePrice, baseDeal) {
+            if (!lastCalculation && (!Number.isFinite(baseSalePrice) || baseSalePrice <= 0)) return;
+            const basePrice = Number.isFinite(baseSalePrice) ? baseSalePrice : lastCalculation.salePrice;
+            const params = lastCalculation ? lastCalculation.params : getCalculationInput();
+            const scenarios = CalculatorCore.buildScenarios(basePrice, currentScenarioStep);
             const tbody = document.getElementById('scenarioTableBody');
             tbody.innerHTML = '';
 
+            const isAllInvestors = currentFinModel === 'investor' && currentInvestorScenarioView === 'all';
+            const colProjectYield = document.getElementById('colHeaderProjectYield');
             const colInvProfit = document.getElementById('colHeaderInvProfit');
             const colInvYield = document.getElementById('colHeaderInvYield');
-            if (currentFinModel === 'investor') {
-                colInvProfit.textContent = "Прибыль инвестора";
-                colInvYield.textContent = "Доходность инв-ра";
+            const scenarioHint = document.getElementById('scenarioHint');
+            colInvYield.classList.toggle('hidden', isAllInvestors);
+            if (isAllInvestors) {
+                colProjectYield.textContent = 'Прибыль инвесторов';
+                colInvProfit.textContent = 'Прибыль собственника';
+                scenarioHint.textContent = '💡 Налог и распределение положительной прибыли пересчитаны для каждой цены продажи.';
+            } else if (currentFinModel === 'investor') {
+                colProjectYield.textContent = 'Доходность проекта';
+                colInvProfit.textContent = 'Прибыль инвестора';
+                colInvYield.textContent = 'Доходность инв-ра';
+                scenarioHint.textContent = '💡 Доходность проекта и инвестора пересчитана в % годовых с учетом фактического срока сделки.';
             } else {
-                colInvProfit.textContent = "Чистая прибыль";
-                colInvYield.textContent = "🔥 ROE на капитал";
+                colProjectYield.textContent = 'Доходность проекта';
+                colInvProfit.textContent = 'Чистая прибыль';
+                colInvYield.textContent = '🔥 ROE на капитал';
+                scenarioHint.textContent = '💡 Доходность проекта и ROE пересчитаны в % годовых с учетом фактического срока сделки.';
             }
 
-            scenarios.forEach(sc => {
-                const data = computeScenarioMetrics(sc.price);
+            const calculatedScenarios = scenarios.map(function(scenario) {
+                const data = scenario.isValid
+                    ? (scenario.isBase && baseDeal ? baseDeal : computeScenarioMetrics(scenario.price, params))
+                    : null;
                 const tr = document.createElement('tr');
-                
-                if (sc.isBase) {
-                    tr.className = "bg-indigo-50/80 font-bold border-l-4 border-indigo-600 text-indigo-950";
-                } else {
-                    tr.className = "hover:bg-slate-50 transition-colors text-slate-700";
+                tr.className = scenario.isBase
+                    ? 'bg-indigo-50/80 font-bold border-l-4 border-indigo-600 text-indigo-950'
+                    : (scenario.isValid
+                        ? 'hover:bg-slate-50 transition-colors text-slate-700'
+                        : 'bg-rose-50/60 text-slate-400');
+
+                if (!scenario.isValid) {
+                    tr.innerHTML =
+                        '<td class="py-2.5 px-3 font-semibold" style="white-space: nowrap;">' + scenario.name + '</td>'
+                        + '<td class="py-2.5 px-3 text-rose-600 font-semibold" style="white-space: nowrap;">Недопустимая цена</td>'
+                        + '<td class="py-2.5 px-3">—</td><td class="py-2.5 px-3">—</td><td class="py-2.5 px-3">—</td>'
+                        + (isAllInvestors ? '' : '<td class="py-2.5 px-3">—</td>');
+                    tbody.appendChild(tr);
+                    return { scenario: scenario, data: null };
                 }
 
-                const profitClass = data.netProfit >= 0 ? "text-emerald-700 font-bold" : "text-rose-600 font-bold";
-                const invProfitText = currentFinModel === 'investor' ? formatMoney(data.investorProfit) + " ₽" : formatMoney(data.netProfit) + " ₽";
-                const invYieldText = data.investorYield.toFixed(0) + "% год.";
+                const profitClass = data.netProfit >= 0
+                    ? 'text-emerald-700 font-bold'
+                    : 'text-rose-600 font-bold';
+                const priceWithTax = formatMoney(scenario.price) + ' ₽'
+                    + '<span class="block text-[10px] font-normal text-slate-400 mt-0.5">Налог ' + formatMoney(data.tax) + ' ₽</span>';
 
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-semibold" style="white-space: nowrap;">${sc.name}</td>
-                    <td class="py-2.5 px-3" style="white-space: nowrap;">${formatMoney(sc.price)} ₽</td>
-                    <td class="py-2.5 px-3 ${profitClass}" style="white-space: nowrap;">${formatMoney(data.netProfit)} ₽</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-800" style="white-space: nowrap;">${data.projectYield.toFixed(0)}% год.</td>
-                    <td class="py-2.5 px-3 ${currentFinModel === 'investor' ? 'text-indigo-700 font-semibold' : 'text-slate-700 font-bold'}" style="white-space: nowrap;">${invProfitText}</td>
-                    <td class="py-2.5 px-3 font-extrabold ${currentFinModel === 'investor' ? 'text-indigo-700' : 'text-blue-700'}" style="white-space: nowrap;">${invYieldText}</td>
-                `;
+                if (isAllInvestors) {
+                    tr.innerHTML =
+                        '<td class="py-2.5 px-3 font-semibold" style="white-space: nowrap;">' + scenario.name + '</td>'
+                        + '<td class="py-2.5 px-3" style="white-space: nowrap;">' + priceWithTax + '</td>'
+                        + '<td class="py-2.5 px-3 ' + profitClass + '" style="white-space: nowrap;">' + formatMoney(data.netProfit) + ' ₽</td>'
+                        + '<td class="py-2.5 px-3 text-indigo-700 font-semibold" style="white-space: nowrap;">' + formatMoney(data.investorPool.investorsProfit) + ' ₽'
+                        + '<span class="block text-[10px] font-normal text-indigo-400 mt-0.5">' + data.investorPool.annualYield.toFixed(2) + '% годовых</span></td>'
+                        + '<td class="py-2.5 px-3 font-extrabold text-slate-800" style="white-space: nowrap;">' + formatMoney(data.investorPool.ownerProfit) + ' ₽</td>';
+                } else {
+                    const partnerProfit = currentFinModel === 'investor' ? data.investorProfit : data.netProfit;
+                    const partnerYield = currentFinModel === 'investor' ? data.investorYield : data.roe;
+                    tr.innerHTML =
+                        '<td class="py-2.5 px-3 font-semibold" style="white-space: nowrap;">' + scenario.name + '</td>'
+                        + '<td class="py-2.5 px-3" style="white-space: nowrap;">' + priceWithTax + '</td>'
+                        + '<td class="py-2.5 px-3 ' + profitClass + '" style="white-space: nowrap;">' + formatMoney(data.netProfit) + ' ₽</td>'
+                        + '<td class="py-2.5 px-3 font-semibold text-slate-800" style="white-space: nowrap;">' + data.projectYield.toFixed(2) + '% год.</td>'
+                        + '<td class="py-2.5 px-3 ' + (currentFinModel === 'investor' ? 'text-indigo-700 font-semibold' : 'text-slate-700 font-bold')
+                        + '" style="white-space: nowrap;">' + formatMoney(partnerProfit) + ' ₽</td>'
+                        + '<td class="py-2.5 px-3 font-extrabold ' + (currentFinModel === 'investor' ? 'text-indigo-700' : 'text-blue-700')
+                        + '" style="white-space: nowrap;">' + partnerYield.toFixed(2) + '% год.</td>';
+                }
                 tbody.appendChild(tr);
+                return { scenario: scenario, data: data };
             });
+
+            if (lastCalculation) lastCalculation.scenarios = calculatedScenarios;
         }
-
-        function calculateROI(isManualClick) {
+        function renderScenarioTable(baseSalePrice, baseDeal) {
+            return renderUnifiedScenarioTable(baseSalePrice, baseDeal);
+        }
+        function performUnifiedCalculation(isManualClick) {
             updateInvestorShare();
-            const { downPayment, loanAmount } = updateMortgagePreview();
+            const params = getCalculationInput();
+            const dynamicValue = readNumber('dynamicInput', NaN);
+            const isInvestorPoolView = currentFinModel === 'investor'
+                && currentInvestorScenarioView === 'all';
+            const validationOptions = currentMode === 1
+                ? { salePrice: dynamicValue }
+                : { targetYield: dynamicValue, requireSingleInvestor: true };
+            const errors = CalculatorCore.validate(params, validationOptions);
 
-            const dynamicVal = parseFloat(document.getElementById('dynamicInput').value);
-            const buyPrice = parseFloat(document.getElementById('buyPrice').value);
-            const renovation = parseFloat(document.getElementById('renovation').value) || 0;
-            const dealDays = parseFloat(document.getElementById('dealDays').value);
-            
-            const isManualTax = document.getElementById('manualTaxToggle').checked;
-            const manualTaxVal = parseFloat(document.getElementById('manualTaxInput').value) || 0;
-
-            const isDkpDiff = document.getElementById('dkpDiffToggle').checked;
-            const buyPriceDkpInput = parseFloat(document.getElementById('buyPriceDkp').value);
-            const sellPriceDkpInput = parseFloat(document.getElementById('sellPriceDkp').value);
-            const rawDkpPrice = document.getElementById('dkpPrice').value;
-            const isIp = document.querySelector('input[name="ownerType"]:checked').value === 'ip';
-
-            const deductibleType = document.getElementById('deductibleType').value;
-            const deductibleValue = parseFloat(document.getElementById('taxDeductibleValue').value) || 0;
-
-            // Валидация
-            if (isNaN(dynamicVal) || isNaN(buyPrice) || isNaN(dealDays) || dealDays <= 0 || buyPrice <= 0) {
-                if (isManualClick) document.getElementById('errorMessage').classList.remove('hidden');
-                return;
+            if (errors.length) {
+                if (isInvestorPoolView) {
+                    showInvestorPoolValidationErrors(errors);
+                    document.getElementById('errorMessage').classList.add('hidden');
+                    document.getElementById('results').classList.remove('hidden');
+                    setFinancialResultsValidity(false);
+                } else {
+                    document.getElementById('errorText').textContent = errors[0];
+                    document.getElementById('errorMessage').classList.toggle('hidden', !isManualClick && !isCalculated);
+                    document.getElementById('results').classList.add('hidden');
+                }
+                isCalculated = false;
+                return false;
             }
 
-            let investorAmount = 0;
-            let investorsShare = 0;
-            let mortgageRate = 0;
-            let mortgageYears = 25;
-            let mortgageExtraCosts = 0;
-            let monthlyPayment = 0;
-            let bankInterest = 0;
-            let ownCapital = 0;
-
-            if (currentFinModel === 'investor') {
-                investorAmount = parseFloat(document.getElementById('investorAmount').value);
-                investorsShare = parseFloat(document.getElementById('investorsShare').value);
-                if (isNaN(investorAmount) || isNaN(investorsShare)) {
-                    if (isManualClick) document.getElementById('errorMessage').classList.remove('hidden');
-                    return;
+            let salePrice = dynamicValue;
+            let deal;
+            if (currentMode === 2) {
+                const solved = CalculatorCore.solveSalePrice(params, dynamicValue);
+                if (!solved.ok) {
+                    document.getElementById('errorText').textContent = solved.errors[0];
+                    document.getElementById('errorMessage').classList.toggle('hidden', isInvestorPoolView);
+                    document.getElementById('results').classList.toggle('hidden', !isInvestorPoolView);
+                    if (isInvestorPoolView) {
+                        showInvestorPoolValidationErrors(solved.errors);
+                        setFinancialResultsValidity(false);
+                    }
+                    isCalculated = false;
+                    return false;
                 }
-            } else {
-                mortgageRate = parseFloat(document.getElementById('mortgageRate').value) || 0;
-                mortgageYears = parseFloat(document.getElementById('mortgageYears').value) || 25;
-                mortgageExtraCosts = parseFloat(document.getElementById('mortgageExtraCosts').value) || 0;
-
-                monthlyPayment = calculateAnnuity(loanAmount, mortgageRate, mortgageYears);
-                bankInterest = loanAmount * (mortgageRate / 100) * (dealDays / 365);
-                
-                const monthsInDeal = Math.max(1, Math.ceil(dealDays / 30.4167));
-                const totalCashPaymentsDuringDeal = monthlyPayment * monthsInDeal;
-                ownCapital = downPayment + renovation + mortgageExtraCosts + totalCashPaymentsDuringDeal;
-            }
-
-            let salePrice = 0;
-
-            // Расчет налога
-            let tax = 0;
-            let taxIp = 0;
-            let taxFiz = 0;
-
-            if (currentMode === 1) {
-                salePrice = dynamicVal;
-                document.getElementById('resRequiredSalePriceBlock').classList.add('hidden');
-
-                const effectiveBuyDkp = (isDkpDiff && !isNaN(buyPriceDkpInput)) ? buyPriceDkpInput : buyPrice;
-                let effectiveSellDkp = salePrice;
-                if (isDkpDiff && !isNaN(sellPriceDkpInput)) {
-                    effectiveSellDkp = sellPriceDkpInput;
-                } else if (rawDkpPrice.trim() !== "" && !isNaN(parseFloat(rawDkpPrice))) {
-                    effectiveSellDkp = parseFloat(rawDkpPrice);
-                }
-
-                if (isManualTax) {
-                    tax = manualTaxVal;
-                    document.getElementById('resTaxModeDesc').textContent = "введен вручную";
-                } else {
-                    const taxBaseIp = calculateTaxBase(effectiveSellDkp, effectiveBuyDkp, renovation, true, deductibleValue, deductibleType, bankInterest, mortgageExtraCosts);
-                    taxIp = Math.max(0, taxBaseIp * 0.15);
-                    const taxBaseFiz = calculateTaxBase(effectiveSellDkp, effectiveBuyDkp, renovation, false, deductibleValue, deductibleType, bankInterest, mortgageExtraCosts);
-                    taxFiz = Math.max(0, taxBaseFiz * 0.15);
-                    tax = isIp ? taxIp : taxFiz;
-                    document.getElementById('resTaxModeDesc').textContent = isIp ? "ИП (15% доходы - расходы)" : "Физ. лицо (15%)";
-                }
-
-            } else {
-                // Режим 2: Узнать цену продажи
-                let requiredNetProfitProject = 0;
-                if (currentFinModel === 'investor') {
-                    const requiredInvestorProfit = investorAmount * (dynamicVal / 100) * (dealDays / 365);
-                    requiredNetProfitProject = requiredInvestorProfit / (investorsShare / 100);
-                } else {
-                    requiredNetProfitProject = ownCapital * (dynamicVal / 100) * (dealDays / 365);
-                }
-
-                const otherCosts = currentFinModel === 'mortgage' ? (bankInterest + mortgageExtraCosts) : 0;
-
-                if (isManualTax) {
-                    tax = manualTaxVal;
-                    salePrice = requiredNetProfitProject + tax + buyPrice + renovation + otherCosts;
-                    document.getElementById('resTaxModeDesc').textContent = "введен вручную";
-                } else {
-                    const effectiveBuyDkp = (isDkpDiff && !isNaN(buyPriceDkpInput)) ? buyPriceDkpInput : buyPrice;
-                    let renDeduction = isIp ? (deductibleType === 'percent' ? renovation * (deductibleValue / 100) : deductibleValue) : 0;
-                    let extraDeduction = isIp ? (bankInterest + mortgageExtraCosts) : bankInterest;
-                    let totalDeductions = renDeduction + extraDeduction;
-
-                    salePrice = (requiredNetProfitProject + buyPrice + renovation + otherCosts + 0.15 * effectiveBuyDkp - 0.15 * totalDeductions) / 0.85;
-                    const taxBase = calculateTaxBase(salePrice, effectiveBuyDkp, renovation, isIp, deductibleValue, deductibleType, bankInterest, mortgageExtraCosts);
-                    tax = Math.max(0, taxBase * 0.15);
-                    document.getElementById('resTaxModeDesc').textContent = isIp ? "ИП (15%)" : "Физ. лицо (15%)";
-                }
-
+                salePrice = solved.salePrice;
+                deal = solved.deal;
                 document.getElementById('resRequiredSalePriceBlock').classList.remove('hidden');
-                document.getElementById('resRequiredSalePrice').textContent = formatMoney(salePrice) + " ₽";
+                document.getElementById('resRequiredSalePrice').textContent = formatMoney(salePrice) + ' ₽';
+            } else {
+                deal = CalculatorCore.calculateDeal(params, salePrice);
+                document.getElementById('resRequiredSalePriceBlock').classList.add('hidden');
+            }
+
+            if (!Number.isFinite(deal.netProfit)
+                || !Number.isFinite(deal.projectYield)
+                || (currentFinModel === 'investor' && !Number.isFinite(deal.investorYield))
+                || (currentFinModel === 'mortgage' && !Number.isFinite(deal.roe))) {
+                document.getElementById('errorText').textContent = 'Расчет не выполнен: проверьте исходные данные.';
+                document.getElementById('errorMessage').classList.toggle('hidden', isInvestorPoolView);
+                document.getElementById('results').classList.toggle('hidden', !isInvestorPoolView);
+                if (isInvestorPoolView) {
+                    showInvestorPoolValidationErrors(['Расчет не выполнен: проверьте исходные данные.']);
+                    setFinancialResultsValidity(false);
+                }
+                isCalculated = false;
+                return false;
             }
 
             document.getElementById('errorMessage').classList.add('hidden');
-            isCalculated = true;
+            showInvestorPoolValidationErrors([]);
+            setFinancialResultsValidity(true);
+            document.getElementById('resTaxModeDesc').textContent = params.tax.manual
+                ? 'введен вручную'
+                : (params.tax.ownerType === 'ip' ? 'ИП (15% доходы - расходы)' : 'Физ. лицо (15%)');
 
-            // Фактические результаты
             if (currentFinModel === 'investor') {
-                const grossMargin = salePrice - buyPrice - renovation;
-                const netProfitProject = grossMargin - tax;
-                const investorProfit = netProfitProject * (investorsShare / 100);
-                
-                const projectYield = (netProfitProject / (buyPrice + renovation)) * (365 / dealDays) * 100;
-                const investorYield = (investorProfit / investorAmount) * (365 / dealDays) * 100;
-
-                document.getElementById('lblCard1').textContent = "Прибыль проекта (Тотал)";
-                document.getElementById('resCard1').textContent = formatMoney(netProfitProject) + " ₽";
-
-                document.getElementById('lblCard2').textContent = "Доходность проекта";
-                document.getElementById('resCard2').textContent = projectYield.toFixed(0) + "% годовых";
-
-                document.getElementById('lblCard3').textContent = "Прибыль инвестора";
-                document.getElementById('resCard3').textContent = formatMoney(investorProfit) + " ₽";
-
-                document.getElementById('lblCard4').textContent = "Доходность инвестора";
-                document.getElementById('resCard4').textContent = investorYield.toFixed(0) + "% годовых";
-
+                document.getElementById('lblCard1').textContent = 'Прибыль проекта (Тотал)';
+                document.getElementById('resCard1').textContent = formatMoney(deal.netProfit) + ' ₽';
+                document.getElementById('lblCard2').textContent = 'Доходность проекта';
+                document.getElementById('resCard2').textContent = deal.projectYield.toFixed(2) + '% годовых';
+                if (currentInvestorScenarioView === 'all') {
+                    document.getElementById('lblCard3').textContent = 'Прибыль всех инвесторов';
+                    document.getElementById('resCard3').textContent = formatMoney(deal.investorPool.investorsProfit) + ' ₽';
+                    document.getElementById('resCard3Secondary').textContent = 'Совокупная доходность: '
+                        + deal.investorPool.annualYield.toFixed(2) + '% годовых';
+                    document.getElementById('resCard3Secondary').classList.remove('hidden');
+                    document.getElementById('lblCard4').textContent = 'Прибыль собственника';
+                    document.getElementById('resCard4').textContent = formatMoney(deal.investorPool.ownerProfit) + ' ₽';
+                } else {
+                    document.getElementById('lblCard3').textContent = 'Прибыль инвестора';
+                    document.getElementById('resCard3').textContent = formatMoney(deal.investorProfit) + ' ₽';
+                    document.getElementById('resCard3Secondary').classList.add('hidden');
+                    document.getElementById('lblCard4').textContent = 'Доходность инвестора';
+                    document.getElementById('resCard4').textContent = deal.investorYield.toFixed(2) + '% годовых';
+                }
                 document.getElementById('mortgageDetailsBar').classList.add('hidden');
             } else {
-                const totalExpenses = buyPrice + renovation + bankInterest + mortgageExtraCosts;
-                const netProfitFlipper = salePrice - totalExpenses - tax;
-                const projectYield = (netProfitFlipper / totalExpenses) * (365 / dealDays) * 100;
-                const roe = (netProfitFlipper / ownCapital) * (365 / dealDays) * 100;
-
-                document.getElementById('lblCard1').textContent = "Чистая прибыль флиппера";
-                document.getElementById('resCard1').textContent = formatMoney(netProfitFlipper) + " ₽";
-
-                document.getElementById('lblCard2').textContent = "Общая доходность объекта";
-                document.getElementById('resCard2').textContent = projectYield.toFixed(0) + "% годовых";
-
-                document.getElementById('lblCard3').textContent = "Собственные вложения";
-                document.getElementById('resCard3').textContent = formatMoney(ownCapital) + " ₽";
-
-                document.getElementById('lblCard4').textContent = "🔥 Доходность на капитал (ROE)";
-                document.getElementById('resCard4').textContent = roe.toFixed(0) + "% годовых";
-
+                document.getElementById('lblCard1').textContent = 'Чистая прибыль флиппера';
+                document.getElementById('resCard1').textContent = formatMoney(deal.netProfit) + ' ₽';
+                document.getElementById('lblCard2').textContent = 'Общая доходность объекта';
+                document.getElementById('resCard2').textContent = deal.projectYield.toFixed(2) + '% годовых';
+                document.getElementById('lblCard3').textContent = 'Собственные вложения';
+                document.getElementById('resCard3').textContent = formatMoney(deal.mortgage.ownCapital) + ' ₽';
+                document.getElementById('resCard3Secondary').classList.add('hidden');
+                document.getElementById('lblCard4').textContent = '🔥 Доходность на капитал (ROE)';
+                document.getElementById('resCard4').textContent = deal.roe.toFixed(2) + '% годовых';
                 document.getElementById('mortgageDetailsBar').classList.remove('hidden');
-                document.getElementById('resMonthlyPayment').textContent = formatMoney(monthlyPayment) + " ₽ / мес";
-                document.getElementById('resBankInterest').textContent = formatMoney(bankInterest) + " ₽";
-                document.getElementById('resLoanRepay').textContent = formatMoney(loanAmount) + " ₽";
+                document.getElementById('resMonthlyPayment').textContent = formatMoney(deal.mortgage.monthlyPayment) + ' ₽ / мес';
+                document.getElementById('resBankInterest').textContent = formatMoney(deal.mortgage.interestPaid) + ' ₽';
+                document.getElementById('resLoanRepay').textContent = formatMoney(deal.mortgage.outstandingPrincipal) + ' ₽';
             }
+            document.getElementById('resTax').textContent = formatMoney(deal.tax) + ' ₽';
 
-            document.getElementById('resTax').textContent = formatMoney(tax) + " ₽";
-
-            // Умное резюме
             let summaryHtml = '';
-            if (!isManualTax && taxIp > 0 && taxFiz > 0) {
-                const diffTax = Math.abs(taxIp - taxFiz);
-                if (diffTax > 0) {
-                    const betterChoice = taxIp < taxFiz ? 'ИП' : 'Физ. лицо';
-                    summaryHtml += `<div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-800 text-sm mb-3">
-                        <strong>💡 Налоговый совет:</strong> Выгоднее оформить сделку на <strong>${betterChoice}</strong>. 
-                        Экономия на налогах составит <strong>${formatMoney(diffTax)} ₽</strong>.
-                    </div>`;
+            if (!params.tax.manual) {
+                const ipDeal = CalculatorCore.calculateDeal(
+                    Object.assign({}, params, { tax: Object.assign({}, params.tax, { ownerType: 'ip' }) }),
+                    salePrice
+                );
+                const fizDeal = CalculatorCore.calculateDeal(
+                    Object.assign({}, params, { tax: Object.assign({}, params.tax, { ownerType: 'fiz' }) }),
+                    salePrice
+                );
+                const taxDifference = Math.abs(ipDeal.tax - fizDeal.tax);
+                if (ipDeal.tax > 0 && fizDeal.tax > 0 && taxDifference > 0.5) {
+                    const betterChoice = ipDeal.tax < fizDeal.tax ? 'ИП' : 'Физ. лицо';
+                    summaryHtml += '<div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-800 text-sm mb-3">'
+                        + '<strong>💡 Налоговый совет:</strong> Выгоднее оформить сделку на <strong>' + betterChoice + '</strong>. '
+                        + 'Экономия на налогах составит <strong>' + formatMoney(taxDifference) + ' ₽</strong>.'
+                        + '</div>';
                 }
             }
-
             if (currentFinModel === 'mortgage') {
-                const totalExpenses = buyPrice + renovation + bankInterest + mortgageExtraCosts;
-                const netProfitFlipper = salePrice - totalExpenses - tax;
-                const roe = (netProfitFlipper / ownCapital) * (365 / dealDays) * 100;
-
-                summaryHtml += `<div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-indigo-900 text-sm">
-                    <strong>🚀 Эффект кредитного плеча:</strong> За счет кредита / ипотеки вам понадобилось всего 
-                    <strong>${formatMoney(ownCapital)} ₽</strong> собственных денег вместо полной покупки. 
-                    Ваш ROE разогнан до <strong>${roe.toFixed(0)}% годовых</strong>, а прибыль (<strong>${formatMoney(netProfitFlipper)} ₽</strong>) остается у вас без раздела с инвестором!
-                </div>`;
+                summaryHtml += '<div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-indigo-900 text-sm">'
+                    + '<strong>🚀 Эффект кредитного плеча:</strong> Собственные вложения составили '
+                    + '<strong>' + formatMoney(deal.mortgage.ownCapital) + ' ₽</strong>. '
+                    + 'ROE: <strong>' + deal.roe.toFixed(2) + '% годовых</strong>, чистая прибыль: '
+                    + '<strong>' + formatMoney(deal.netProfit) + ' ₽</strong>.'
+                    + '</div>';
             }
-
             document.getElementById('smartSummary').innerHTML = summaryHtml;
             document.getElementById('results').classList.remove('hidden');
 
-            // Заполняем сводную таблицу сценариев
-            renderScenarioTable(salePrice);
+            isCalculated = true;
+            hasCompletedCalculation = true;
+            lastCalculation = {
+                params: params,
+                salePrice: salePrice,
+                deal: deal,
+                targetYield: currentMode === 2 ? dynamicValue : null,
+                scenarios: []
+            };
+            renderScenarioTable(salePrice, deal);
+            return true;
         }
 
+        function calculateROI(isManualClick) {
+            return performUnifiedCalculation(isManualClick);
+        }
         function exportCalculationToPDF() {
-            if (!isCalculated) {
-                calculateROI(true);
-            }
+            if (!isCalculated && !calculateROI(true)) return;
+            if (!lastCalculation) return;
 
             const btn = document.getElementById('btnSavePdf');
             const btnText = document.getElementById('btnSavePdfText');
@@ -1030,12 +1453,16 @@
             const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
             
             const modeText = currentMode === 1 ? "Расчет доходности" : "Расчет требуемой цены";
-            const finModelText = currentFinModel === 'investor' ? "Частный инвестор" : "Ипотека / кредит банка";
+            const isAllInvestorsPdf = currentFinModel === 'investor' && currentInvestorScenarioView === 'all';
+            const finModelText = currentFinModel === 'investor'
+                ? (isAllInvestorsPdf ? "Частные инвесторы · Все инвесторы" : "Частный инвестор")
+                : "Ипотека / кредит банка";
             
-            const buyPrice = formatMoney(parseFloat(document.getElementById('buyPrice').value) || 0) + " ₽";
-            const planRen = formatMoney(parseFloat(document.getElementById('planRenovation').value) || 0) + " ₽";
-            const ren = formatMoney(parseFloat(document.getElementById('renovation').value) || 0) + " ₽";
-            const days = (document.getElementById('dealDays').value || 0) + " дней";
+            const buyPrice = formatMoney(lastCalculation.params.buyPrice) + " ₽";
+            const salePricePdf = formatMoney(lastCalculation.salePrice) + " ₽";
+            const planRen = formatMoney(lastCalculation.params.plannedExpenses) + " ₽";
+            const ren = formatMoney(lastCalculation.params.actualExpenses) + " ₽";
+            const days = lastCalculation.params.dealDays + " дней";
 
             const isManualTax = document.getElementById('manualTaxToggle').checked;
             const taxDesc = isManualTax ? 'Введен вручную' : (document.querySelector('input[name="ownerType"]:checked').value === 'ip' ? 'ИП (УСН 15%)' : 'Физ. лицо (НДФЛ 15%)');
@@ -1046,18 +1473,77 @@
             const card2Val = document.getElementById('resCard2').textContent;
             const card3Label = document.getElementById('lblCard3').textContent;
             const card3Val = document.getElementById('resCard3').textContent;
+            const card3Secondary = isAllInvestorsPdf
+                ? lastCalculation.deal.investorPool.annualYield.toFixed(2) + '% годовых'
+                : '';
             const card4Label = document.getElementById('lblCard4').textContent;
             const card4Val = document.getElementById('resCard4').textContent;
             const taxVal = document.getElementById('resTax').textContent;
 
-            // HTML сводной таблицы для PDF
-            const tableRows = document.getElementById('scenarioTableBody').innerHTML;
+            // PDF использует тот же массив сценариев и те же результаты финансового ядра.
+            const tableRows = lastCalculation.scenarios.map(function(item) {
+                const background = item.scenario.isBase ? '#eef2ff' : '#ffffff';
+                const weight = item.scenario.isBase ? '700' : '400';
+                if (!item.data) {
+                    return '<tr style="background:#fff1f2;color:#94a3b8;border-bottom:1px solid #e2e8f0;">'
+                        + '<td style="padding:4px 5px;white-space:nowrap;">' + item.scenario.name + '</td>'
+                        + '<td style="padding:4px 5px;color:#e11d48;">Недопустимая цена</td>'
+                        + '<td style="padding:4px 5px;">—</td><td style="padding:4px 5px;">—</td><td style="padding:4px 5px;">—</td>'
+                        + (isAllInvestorsPdf ? '' : '<td style="padding:4px 5px;">—</td>')
+                        + '</tr>';
+                }
+                const priceWithTax = formatMoney(item.scenario.price) + ' ₽'
+                    + '<span style="display:block;font-size:7.5px;color:#94a3b8;font-weight:400;">Налог ' + formatMoney(item.data.tax) + ' ₽</span>';
+                if (isAllInvestorsPdf) {
+                    return '<tr style="background:' + background + ';font-weight:' + weight + ';border-bottom:1px solid #e2e8f0;">'
+                        + '<td style="padding:4px 5px;white-space:nowrap;">' + item.scenario.name + '</td>'
+                        + '<td style="padding:4px 5px;white-space:nowrap;">' + priceWithTax + '</td>'
+                        + '<td style="padding:4px 5px;white-space:nowrap;">' + formatMoney(item.data.netProfit) + ' ₽</td>'
+                        + '<td style="padding:4px 5px;white-space:nowrap;">' + formatMoney(item.data.investorPool.investorsProfit) + ' ₽'
+                        + '<span style="display:block;font-size:7.5px;color:#818cf8;font-weight:400;">' + item.data.investorPool.annualYield.toFixed(2) + '% годовых</span></td>'
+                        + '<td style="padding:4px 5px;white-space:nowrap;">' + formatMoney(item.data.investorPool.ownerProfit) + ' ₽</td>'
+                        + '</tr>';
+                }
+                const partnerProfit = currentFinModel === 'investor' ? item.data.investorProfit : item.data.netProfit;
+                const partnerYield = currentFinModel === 'investor' ? item.data.investorYield : item.data.roe;
+                return '<tr style="background:' + background + ';font-weight:' + weight + ';border-bottom:1px solid #e2e8f0;">'
+                    + '<td style="padding:4px 5px;white-space:nowrap;">' + item.scenario.name + '</td>'
+                    + '<td style="padding:4px 5px;white-space:nowrap;">' + priceWithTax + '</td>'
+                    + '<td style="padding:4px 5px;white-space:nowrap;">' + formatMoney(item.data.netProfit) + ' ₽</td>'
+                    + '<td style="padding:4px 5px;white-space:nowrap;">' + item.data.projectYield.toFixed(2) + '%</td>'
+                    + '<td style="padding:4px 5px;white-space:nowrap;">' + formatMoney(partnerProfit) + ' ₽</td>'
+                    + '<td style="padding:4px 5px;white-space:nowrap;">' + partnerYield.toFixed(2) + '%</td>'
+                    + '</tr>';
+            }).join('');
+
+            const scenarioHeaders = isAllInvestorsPdf
+                ? '<th style="padding:4px 5px;width:18%;">Сценарий</th>'
+                    + '<th style="padding:4px 5px;width:21%;">Цена продажи</th>'
+                    + '<th style="padding:4px 5px;width:20%;">Прибыль проекта</th>'
+                    + '<th style="padding:4px 5px;width:21%;">Прибыль инвесторов</th>'
+                    + '<th style="padding:4px 5px;width:20%;">Прибыль собственника</th>'
+                : '<th style="padding:4px 5px;width:17%;">Сценарий</th>'
+                    + '<th style="padding:4px 5px;width:18%;">Цена продажи</th>'
+                    + '<th style="padding:4px 5px;width:18%;">Прибыль проекта</th>'
+                    + '<th style="padding:4px 5px;width:14%;">Доходность</th>'
+                    + '<th style="padding:4px 5px;width:18%;">' + (currentFinModel === 'investor' ? 'Доход инвестора' : 'Чистая прибыль') + '</th>'
+                    + '<th style="padding:4px 5px;width:15%;">' + (currentFinModel === 'investor' ? '% инвестора' : 'ROE') + '</th>';
 
             let finDetailsHtml = "";
-            if (currentFinModel === 'investor') {
-                const invAmt = formatMoney(parseFloat(document.getElementById('investorAmount').value) || 0) + " ₽";
-                const invShare = (document.getElementById('investorsShare').value || 0) + "%";
-                const mult = (document.getElementById('profitMultiplier').value || 60) + "%";
+            if (isAllInvestorsPdf) {
+                const pool = lastCalculation.deal.investorPool;
+                finDetailsHtml =
+                    '<div style="background:#f8fafc;padding:10px;border-radius:8px;border:1px solid #e2e8f0;margin-bottom:10px;">'
+                    + '<h4 style="margin:0 0 5px 0;font-size:11px;color:#334155;text-transform:uppercase;font-weight:700;">Параметры всех инвесторов</h4>'
+                    + '<table style="width:100%;font-size:11px;border-collapse:collapse;">'
+                    + '<tr><td style="padding:2px 0;color:#64748b;">Совокупная сумма займов:</td><td style="text-align:right;font-weight:bold;">' + formatMoney(pool.totalLoan) + ' ₽</td></tr>'
+                    + '<tr><td style="padding:2px 0;color:#64748b;">Средневзвешенные условия:</td><td style="text-align:right;font-weight:bold;">' + pool.weightedProfitPercent.toFixed(2) + '%</td></tr>'
+                    + '<tr><td style="padding:2px 0;color:#64748b;">Совокупная доля прибыли:</td><td style="text-align:right;font-weight:bold;color:#4338ca;">' + (pool.totalShare * 100).toFixed(2) + '%</td></tr>'
+                    + '</table></div>';
+            } else if (currentFinModel === 'investor') {
+                const invAmt = formatMoney(lastCalculation.params.investorAmount) + " ₽";
+                const invShare = (lastCalculation.deal.investorShare * 100).toFixed(2) + "%";
+                const mult = lastCalculation.params.profitMultiplierPercent + "%";
                 finDetailsHtml = `
                     <div style="background: #f8fafc; padding: 10px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
                         <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Параметры инвестора</h4>
@@ -1089,7 +1575,7 @@
             }
 
             const pdfHtml = `
-                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 18px 22px; color: #0f172a; background: #ffffff; width: 720px; box-sizing: border-box; margin: 0 auto;">
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 18px 22px; color: #0f172a; background: #ffffff; width: 700px; box-sizing: border-box; margin: 0;">
                     <div style="border-bottom: 2px solid #4f46e5; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: flex-end;">
                         <div>
                             <span style="font-size: 10px; font-weight: 700; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.8px;">Инвестиционный отчет флиппинг-проекта</span>
@@ -1107,8 +1593,9 @@
                             <h4 style="margin: 0 0 5px 0; font-size: 11px; color: #334155; text-transform: uppercase; font-weight: 700;">Фактический объект (Cash Flow)</h4>
                             <table style="width: 100%; font-size: 11px; border-collapse: collapse;">
                                 <tr><td style="padding: 2px 0; color: #64748b;">Покупка:</td><td style="text-align: right; font-weight: bold;">${buyPrice}</td></tr>
-                                <tr><td style="padding: 2px 0; color: #64748b;">План. ремонт:</td><td style="text-align: right; font-weight: bold;">${planRen}</td></tr>
-                                <tr><td style="padding: 2px 0; color: #64748b;">Факт. ремонт:</td><td style="text-align: right; font-weight: bold;">${ren}</td></tr>
+                                <tr><td style="padding: 2px 0; color: #64748b;">Продажа:</td><td style="text-align: right; font-weight: bold;">${salePricePdf}</td></tr>
+                                <tr><td style="padding: 2px 0; color: #64748b;">План. расходы:</td><td style="text-align: right; font-weight: bold;">${planRen}</td></tr>
+                                <tr><td style="padding: 2px 0; color: #64748b;">Факт. расходы:</td><td style="text-align: right; font-weight: bold;">${ren}</td></tr>
                                 <tr><td style="padding: 2px 0; color: #64748b;">Срок сделки:</td><td style="text-align: right; font-weight: bold;">${days}</td></tr>
                             </table>
                         </div>
@@ -1137,6 +1624,7 @@
                         <div style="background: #eef2ff; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #4f46e5;">
                             <span style="font-size: 10.5px; color: #4338ca; display: block; margin-bottom: 2px; font-weight: 600;">${card3Label}</span>
                             <span style="font-size: 16px; font-weight: 800; color: #3730a3;">${card3Val}</span>
+                            ${card3Secondary ? `<span style="display:block;font-size:9px;color:#6366f1;margin-top:2px;font-weight:600;">${card3Secondary}</span>` : ''}
                         </div>
                         <div style="background: #eef2ff; padding: 9px 12px; border-radius: 8px; border-left: 3px solid #4f46e5;">
                             <span style="font-size: 10.5px; color: #4338ca; display: block; margin-bottom: 2px; font-weight: 600;">${card4Label}</span>
@@ -1147,15 +1635,10 @@
                     <!-- Сводная таблица сценариев в PDF -->
                     <h3 style="font-size: 12px; margin: 10px 0 6px 0; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Сводная таблица сценариев реализации</h3>
                     <div style="border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; margin-bottom: 12px;">
-                        <table style="width: 100%; font-size: 10.5px; border-collapse: collapse; text-align: left;">
+                        <table style="width: 100%; table-layout: fixed; font-size: 8.5px; border-collapse: collapse; text-align: left;">
                             <thead>
                                 <tr style="background: #f1f5f9; color: #334155; border-bottom: 1px solid #cbd5e1;">
-                                    <th style="padding: 5px 7px;">Сценарий</th>
-                                    <th style="padding: 5px 7px;">Цена продажи</th>
-                                    <th style="padding: 5px 7px;">Прибыль проекта</th>
-                                    <th style="padding: 5px 7px;">Доходность</th>
-                                    <th style="padding: 5px 7px;">${currentFinModel === 'investor' ? 'Доход инвестора' : 'Чистая прибыль'}</th>
-                                    <th style="padding: 5px 7px;">${currentFinModel === 'investor' ? '% инвестора' : 'ROE'}</th>
+                                    ${scenarioHeaders}
                                 </tr>
                             </thead>
                             <tbody style="line-height: 1.35;">
@@ -1173,10 +1656,10 @@
 
             const container = document.getElementById('pdfExportContainer');
             container.innerHTML = pdfHtml;
-            container.style.position = 'fixed';
+            container.style.position = 'absolute';
             container.style.left = '0';
             container.style.top = '0';
-            container.style.width = '100%';
+            container.style.width = '700px';
             container.style.zIndex = '-9999';
             container.style.opacity = '1';
             container.classList.remove('hidden');
@@ -1190,11 +1673,10 @@
                     scale: 2, 
                     useCORS: true, 
                     logging: false,
-                    scrollX: 0,
-                    scrollY: 0,
                     x: 0,
                     y: 0,
-                    windowWidth: 1024
+                    width: 700,
+                    windowWidth: 700
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
