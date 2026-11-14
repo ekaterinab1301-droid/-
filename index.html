@@ -16,6 +16,29 @@
         input[type=number] {
             -moz-appearance: textfield;
         }
+        /* Keep scenario labels visible while swiping the scenario matrix on phones. */
+        @media (max-width: 639px) {
+            .scenario-table-scroll th:first-child,
+            .scenario-table-scroll td:first-child {
+                position: sticky;
+                left: 0;
+                z-index: 2;
+                min-width: 136px;
+                white-space: nowrap;
+                background: #ffffff;
+                box-shadow: 2px 0 5px rgba(15, 23, 42, 0.12);
+            }
+            .scenario-table-scroll thead th:first-child {
+                z-index: 3;
+                background: #f8fafc;
+            }
+            .scenario-table-scroll tbody tr.bg-indigo-50\/80 td:first-child {
+                background: #eef2ff;
+            }
+            .scenario-table-scroll tbody tr.bg-rose-50\/60 td:first-child {
+                background: #fff1f2;
+            }
+        }
         @media print {
             body { background: white !important; padding: 0 !important; }
             #copyLinkBtn, button { display: none !important; }
@@ -372,7 +395,7 @@
                         </div>
                     </details>
 
-                    <div class="financial-output overflow-x-auto transition-opacity">
+                    <div class="financial-output overflow-x-auto transition-opacity scenario-table-scroll">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
                                 <tr class="bg-slate-50 text-slate-600 border-b border-slate-200">
