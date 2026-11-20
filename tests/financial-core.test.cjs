@@ -91,12 +91,39 @@ test('индивидуальные условия 50/50, 55/45 и 60/40 счит
         [6_000_000, 60]
     ].forEach(([amount, multiplier]) => {
         const params = baseParams({ investorAmount: amount, profitMultiplierPercent: multiplier });
+        const financingSharePercent = Core.roundPercent((amount / 12_000_000) * 100);
+        const projectProfitSharePercent = Core.roundPercent(financingSharePercent * (multiplier / 100));
         approx(
             Core.investorShare(params),
-            (amount / 12_000_000) * (multiplier / 100),
+            projectProfitSharePercent / 100,
             1e-12
         );
     });
+});
+
+test('договорная доля использует двухступенчатое округление до 0,01%', () => {
+    const params = baseParams({
+        investorAmount: 4_000_000,
+        profitMultiplierPercent: 55
+    });
+    const share = Core.investorShare(params);
+
+    assert.equal(Core.roundPercent((4_000_000 / 12_000_000) * 100), 33.33);
+    assert.equal(share, 0.1833);
+    assert.notEqual(share, (4_000_000 / 12_000_000) * 0.55);
+});
+
+test('каждая доля в группе инвесторов округляется по договорной методике', () => {
+    const params = baseParams({
+        investorAnalysisMode: 'all',
+        investors: [
+            { amount: 4_000_000, profitPercent: 55 },
+            { amount: 3_000_000, profitPercent: 60 }
+        ]
+    });
+    const deal = Core.calculateDeal(params, 14_000_000);
+
+    assert.equal(deal.investorPool.totalShare, 0.3333);
 });
 
 test('экономия и перерасход не пересчитывают долю инвестора', () => {

@@ -254,7 +254,7 @@
                                 </select>
                             </div>
                             <input type="text" id="investorsShare" readonly placeholder="Считается автоматически" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-700 cursor-not-allowed">
-                            <p class="text-[11px] text-slate-500 mt-1">Расчет: (Займ / (Покупка + План. ремонт)) × <span id="multDisplay" class="font-bold">60</span>%</p>
+                            <p class="text-[11px] text-slate-500 mt-1">Расчет: доля займа в бюджете округляется до 0,01%, умножается на договорные <span id="multDisplay" class="font-bold">60</span>%, затем итоговая доля в прибыли снова округляется до 0,01%. Бюджет = покупка + все плановые расходы.</p>
                         </div>
                     </div>
 
@@ -447,10 +447,26 @@
                 return typeof value === 'number' && Number.isFinite(value);
             }
 
+            function roundPercent(value) {
+                return Math.round((value + Number.EPSILON) * 100) / 100;
+            }
+
+            function contractualInvestorShare(budget, investorAmount, profitMultiplierPercent) {
+                if (budget <= 0 || investorAmount <= 0) return 0;
+                const financingSharePercent = roundPercent((investorAmount / budget) * 100);
+                const projectProfitSharePercent = roundPercent(
+                    financingSharePercent * (profitMultiplierPercent / 100)
+                );
+                return projectProfitSharePercent / 100;
+            }
+
             function investorShare(params) {
                 const budget = params.buyPrice + params.plannedExpenses;
-                if (budget <= 0 || params.investorAmount <= 0) return 0;
-                return (params.investorAmount / budget) * (params.profitMultiplierPercent / 100);
+                return contractualInvestorShare(
+                    budget,
+                    params.investorAmount,
+                    params.profitMultiplierPercent
+                );
             }
 
             function investorPool(params, distributableProfit) {
@@ -466,7 +482,11 @@
                     : 0;
                 const totalShare = budget > 0
                     ? investors.reduce(function(sum, investor) {
-                        return sum + (investor.amount / budget) * (investor.profitPercent / 100);
+                        return sum + contractualInvestorShare(
+                            budget,
+                            investor.amount,
+                            investor.profitPercent
+                        );
                     }, 0)
                     : 0;
                 const investorsProfit = Math.max(0, distributableProfit) * totalShare;
@@ -772,6 +792,8 @@
                 calculateMortgage: calculateMortgage,
                 calculateTax: calculateTax,
                 calculateDeal: calculateDeal,
+                roundPercent: roundPercent,
+                contractualInvestorShare: contractualInvestorShare,
                 investorShare: investorShare,
                 investorPool: investorPool,
                 validate: validate,
@@ -1107,12 +1129,16 @@
             const mult = parseFloat(multField.value) || 60;
             document.getElementById('multDisplay').textContent = mult;
             
-            const budget = buyPr + planRen;
             let finalShare = "";
             let exactShare = 0;
             
-            if (budget > 0 && invAmt > 0) {
-                exactShare = (invAmt / budget) * (mult / 100);
+            if (buyPr + planRen > 0 && invAmt > 0) {
+                exactShare = CalculatorCore.investorShare({
+                    buyPrice: buyPr,
+                    plannedExpenses: planRen,
+                    investorAmount: invAmt,
+                    profitMultiplierPercent: mult
+                });
                 finalShare = (exactShare * 100).toFixed(2);
             }
             const shareField = document.getElementById('investorsShare');
