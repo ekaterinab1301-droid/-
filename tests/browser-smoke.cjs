@@ -311,7 +311,7 @@ async function inspectPdf() {
     await delay(3000);
 
     const initial = await page.evaluate('(' + inspectInitial.toString() + ')()');
-    assert.equal(initial.title, 'Калькулятор инвестиционной доходности');
+    assert.equal(initial.title, 'ProFlip | Калькулятор инвестиционной доходности Насти');
     assert.equal(initial.hasCore, true);
     assert.deepEqual(initial.scenarioButtons, ['Шаг 300 000 ₽', 'Шаг 500 000 ₽']);
     assert.ok(initial.pageWidth <= initial.viewportWidth);
